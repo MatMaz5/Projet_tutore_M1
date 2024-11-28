@@ -11,7 +11,7 @@ setwd("/Users/matmaz/Master/GitHub/Projet_tutore_M1")
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 # Pour utiliser le code stocker dans un autre fichier :
-source("/Users/matmaz/Master/GitHub/Projet_tutore_M1/nettoyage.R")
+source("/Users/matmaz/Master/GitHub/Projet_tutore_M1/nettoyage_matthias.R)
 # /!\ : script R obligatoire (pas de Rmd)
 ```
 

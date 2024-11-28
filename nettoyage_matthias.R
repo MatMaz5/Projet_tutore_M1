@@ -8,7 +8,7 @@ library(ggplot2)
 
 
 # Importation des données :
-data_brut <- read_excel("/Users/matmaz/Master/M1_SSD/projet_tutore/data.xlsx", col_names = FALSE)
+data_brut <- read_excel("/Users/matmaz/Master/GitHub/Projet_tutore_M1/data.xlsx", col_names = FALSE)
 data <- data_brut
 
 
