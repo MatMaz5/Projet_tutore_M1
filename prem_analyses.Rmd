@@ -1,0 +1,106 @@
+---
+title: "***Appréhension des données***"
+author: "Matthias MAZET"
+output: pdf_document
+---
+
+```{r, echo = FALSE}
+setwd("/Users/matmaz/Master/M1_SSD/projet_tutore")
+```
+
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# Pour utiliser le code stocker dans un autre fichier :
+source("~/Master/M1_SSD/projet_tutore/nettoyage.R")
+# /!\ : script R obligatoire (pas de Rmd)
+```
+
+```{r, echo = FALSE}
+library(knitr)
+```
+
+
+
+***Mettre le nombre de sessions en temps réel.***
+
+
+```{r, echo = FALSE, fig.align='center'}
+plot(1:20, p1$C1.MFI, type = "b", xlab = "Séances", ylab = "MFI Classe I", ylim = c(0, 20300), xlim = c(0, 25), pch = 18, col = 1)
+points(1:20, p2$C1.MFI, type = "b", pch = 18, col = 2)
+points(1:20, p3$C1.MFI, type = "b", pch = 18, col = 3)
+points(1:20, p4$C1.MFI, type = "b", pch = 18, col = 4)
+points(1:20, p5$C1.MFI, type = "b", pch = 18, col = 5)
+points(1:20, p6$C1.MFI, type = "b", pch = 18, col = 6)
+points(1:20, p7$C1.MFI, type = "b", pch = 18, col = 7)
+points(1:20, p8$C1.MFI, type = "b", pch = 18, col = 8)
+points(1:20, p9$C1.MFI, type = "b", pch = 18, col = "coral")
+points(1:20, p10$C1.MFI, type = "b", pch = 18, col = "forestgreen")
+legend("topright", fill = c(1:8, "coral", "forestgreen"), legend = c(1:10), title = "Patients")
+```
+
+
+
+
+```{r, echo = FALSE, fig.align='center'}
+plot(1:20, p1$C2.MFI, type = "b", xlab = "Séances", ylab = "MFI Classe II", ylim = c(0, 21400), xlim = c(0, 25), pch = 18, col = 1)
+points(1:20, p2$C2.MFI, type = "b", pch = 18, col = 2)
+points(1:20, p3$C2.MFI, type = "b", pch = 18, col = 3)
+points(1:20, p4$C2.MFI, type = "b", pch = 18, col = 4)
+points(1:20, p5$C2.MFI, type = "b", pch = 18, col = 5)
+points(1:20, p6$C2.MFI, type = "b", pch = 18, col = 6)
+points(1:20, p7$C2.MFI, type = "b", pch = 18, col = 7)
+points(1:20, p8$C2.MFI, type = "b", pch = 18, col = 8)
+points(1:20, p9$C2.MFI, type = "b", pch = 18, col = "coral")
+points(1:20, p10$C2.MFI, type = "b", pch = 18, col = "forestgreen")
+legend("topright", fill = c(1:8, "coral", "forestgreen"), legend = c(1:10), title = "Patients")
+```
+
+\
+\
+
+***\textcolor{red}{Boxplots `Volume plasma prescrit` -> trop de données manquantes.}***
+\
+\
+
+
+```{r, echo = FALSE, fig.align='center'}
+ggplot(data, aes(x = `Nom du Batch`, y = `Volume plasma traite`)) + geom_boxplot(na.rm = TRUE)
+```
+
+
+
+```{r, echo = FALSE, fig.align='center'}
+ggplot(data, aes(x = Time, y = `Volume plasma traite`)) + geom_boxplot()
+```
+
+
+
+```{r, echo = FALSE, fig.align='center'}
+ggplot(data, aes(x = `Nom du Batch`, y = `Durée de la seance (min )`)) + geom_boxplot(na.rm = TRUE)
+```
+
+
+
+```{r, echo = FALSE, fig.align='center'}
+ggplot(data, aes(x = Time, y = `Durée de la seance (min )`)) + geom_boxplot(na.rm = TRUE)
+```
+
+
+
+\newpage
+
+
+
+***\textcolor{red}{Profil des patients :}***
+```{r, echo = FALSE, fig.align='center'}
+par(mfrow = c(1, 2))
+boxplot(data$`Poids (kg)`, main = "Poids (en kg)")
+boxplot(data$`Taille (cm)`, main = "Taille (en cm)")
+
+kable(summary(data$Sexe) / 20, col.names = "Effectif", align = "c")
+
+kable(table(data$Grossesses) / 20, col.names = c("Grossesses", "Effectifs"), align = "c")
+```
+
+
+
