@@ -1,0 +1,53 @@
+/* Changing style for the main page title */
+.title {
+    font-size: 70px !important;
+}
+
+/* Changing style for the main page authors*/
+.quarto-title-author-name {
+    font-size: 40px;
+}
+
+/* Changing style for the main page date*/
+.date {
+    font-size: 40px;
+    color: gray !important;
+}
+
+/* For the style of the slides. */
+body {
+    background-color: #d0e1fc;
+    font-size: small
+}
+
+/* For the style of 2nd rank titles. */
+h2 {
+	margin-top: 10px;
+	text-decoration: #000000  underline;
+}
+
+
+/* Logo display.*/
+.reveal .slide-logo-bottom-right {
+    bottom: 0 !important;
+    left: unset !important;
+    height: 100% !important;
+    max-height: 2.2rem !important;
+    right: 12px !important;
+}
+
+.slide-logo-max-size {
+    bottom: unset !important;
+    left: 12px;
+    height: 100px !important;
+    max-height: unset !important;
+    right: unset !important;
+    top: 5px;
+}
+
+.reveal .slide-logo {
+    display: block;
+    max-width: unset !important;
+    position: fixed;
+    width: 100x !important;
+}

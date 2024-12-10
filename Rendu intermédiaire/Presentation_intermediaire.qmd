@@ -1,0 +1,86 @@
+---
+title: "Modelling the desensitization in patients awaiting transplantation"
+author: "BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo"
+date: 12/19/2024
+date-format: "DD MMMM YYYY"
+format:
+  revealjs: 
+    slide-number: true
+    chalkboard: 
+      buttons: false
+    preview-links: auto
+    logo: images/Logo_UGA.png
+    css: assets/style.css
+    toc: true
+    resources: images
+    footer: "Tutored Project M1 SDS"
+    header-includes: |
+      <script src="assets/custom.js" type="application/javascript"></script>
+    slide-level: 3
+lang: "en"
+engine: julia
+---
+
+## I - Introdution
+### A) Context
+- Patients with overactive immune systems awaiting transplantation have difficulties accepting the graft because of the antibodies rejecting the new organ.
+- Desensitization protocols increases transplant candidates access to transplantation by decreasing HLA antibodies.
+- By modeling the decrease of HLA antibodies, we can:
+  - improve treatment conditions and future patients access to transplantation;
+  - help patients not to do additional sessions when the immunity activity is already below a specific medical threshold
+
+
+### B) Objectives
+- Study the trends in the data
+- Create proper modelling for each of the concerned antibodies
+- Create an R shiny application for the clinicians to use our models
+
+## II - Data & Methods
+
+### A) Data overview
+
+### B) Methods
+
+## III - Action plan
+### A) Project Management
+```{mermaid}
+gantt
+   title Gantt diagram
+   dateFormat  DD-MM-YYYY
+   section Analyse des données
+   Data cleaning : a1, 23-10-2024, 45d
+   Structuration des données : a2, 23-10-2024, 45d
+   Analyse univariée : a3, 23-10-2024, 45d
+   Analyse bivariée : a4, after a3, 20d
+   Visualisation des données : a5, 23-10-2024, 45d
+   section Soutenance intermédiaire
+   Préparation diaporama : a6, 04-10-2024, 20-12-2024
+   Gestion de projet : a7, 21-10-2024, 20-12-2024
+   Entraînement oral : a8, 09-12-2024, 20-12-2024
+   section Modelisation
+   Exploration logiciel Monolix : a9, after a3  , 50d
+   Recherche de modèles sur R : a10, after a3, 50d
+   Etude bibliographique : a11, after a3, 100d
+   Modélisation des MFI : a12, after a9  , 50d
+   section Rapport final
+   Rédaction : a13, after a8, 90d
+   Cours sur les impacts du numériques : a14, after a3, 40d
+   Bilan carbone : a15, after a3, 100d
+   Relecture : a16, after a13, 30d
+   section Soutenance finale
+   Préparation diaporama : a19, after a8, 50d
+   Entraînement oral : a18, after a12, 30d
+   section Développement Shiny App
+   Construction de l'application : a19, after a12  , 30d
+```
+
+### B) Data cleaning
+
+### C) Univariate description
+
+### D) MFI modelisation
+
+## IV - Future plan
+### A) Schedule overview
+
+### B) Possible scenarios
