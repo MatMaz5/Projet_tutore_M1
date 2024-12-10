@@ -8,7 +8,7 @@ library(ggplot2)
 
 
 # Importation des données :
-data_brut <- read_excel("/Users/matmaz/Master/GitHub/Projet_tutore_M1/data.xlsx", col_names = FALSE)
+data_brut <- read_excel("/Users/matmaz/Master/GitHub/Projet_tutore_M1/data.xlsx", col_names = FALSE) 
 data <- data_brut
 
 
@@ -102,15 +102,6 @@ data$Transplantectomie <- as.integer(data$Transplantectomie)
 
 
 
-
-# Choix entre la valeur diluée ou non (effet prozone) :
-  # Idée : faire une boucle qui parcours la colonne `C1.prozone` et qui supprime soit la vraie valeur soit la 1/5 suivant la réponse ("oui" ou "non"). 
-# Pbs : 
-  # - 2 colonnes prozone à traiter en simultanée `C1.prozone` et `C2.prozone` ;
-  # - la réponse prozone est parfois renseignée une fois et d'autres fois 2.
-
-
-
 # Création des data frame par patient : 
 p1 <- subset(data, data$`Nom du Batch` == "Patient 1")
 p2 <- subset(data, data$`Nom du Batch` == "Patient 2")
@@ -122,5 +113,3 @@ p7 <- subset(data, data$`Nom du Batch` == "Patient 7")
 p8 <- subset(data, data$`Nom du Batch` == "Patient 8")
 p9 <- subset(data, data$`Nom du Batch` == "Patient 9")
 p10 <- subset(data, data$`Nom du Batch` == "Patient 10")
-
-

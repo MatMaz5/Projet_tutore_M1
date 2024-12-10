@@ -64,25 +64,29 @@ legend("topright", fill = c(1:8, "coral", "forestgreen"), legend = c(1:10), titl
 
 
 ```{r, echo = FALSE, fig.align='center'}
-ggplot(data, aes(x = `Nom du Batch`, y = `Volume plasma traite`)) + geom_boxplot(na.rm = TRUE)
+ggplot(data, aes(x = `Nom du Batch`, y = `Volume plasma traite`)) + geom_boxplot(na.rm = TRUE) + 
+  xlab("Patients") + ylab("Plasma treated volume")
 ```
 
 
 
 ```{r, echo = FALSE, fig.align='center'}
-ggplot(data, aes(x = Time, y = `Volume plasma traite`)) + geom_boxplot()
+ggplot(data, aes(x = Time, y = `Volume plasma traite`)) + geom_boxplot(na.rm = TRUE) + 
+  xlab("Time") + ylab("Plasma treated volume")
 ```
 
 
 
 ```{r, echo = FALSE, fig.align='center'}
-ggplot(data, aes(x = `Nom du Batch`, y = `Durée de la seance (min )`)) + geom_boxplot(na.rm = TRUE)
+ggplot(data, aes(x = `Nom du Batch`, y = `Durée de la seance (min )`)) + geom_boxplot(na.rm = TRUE) + 
+  xlab("Patients") + ylab("Session duration (min)")
 ```
 
 
 
 ```{r, echo = FALSE, fig.align='center'}
-ggplot(data, aes(x = Time, y = `Durée de la seance (min )`)) + geom_boxplot(na.rm = TRUE)
+ggplot(data, aes(x = Time, y = `Durée de la seance (min )`)) + geom_boxplot(na.rm = TRUE) + 
+  xlab("Time") + ylab("Session duration (min)")
 ```
 
 
@@ -94,12 +98,12 @@ ggplot(data, aes(x = Time, y = `Durée de la seance (min )`)) + geom_boxplot(na.
 ***\textcolor{red}{Profil des patients :}***
 ```{r, echo = FALSE, fig.align='center'}
 par(mfrow = c(1, 2))
-boxplot(data$`Poids (kg)`, main = "Poids (en kg)")
-boxplot(data$`Taille (cm)`, main = "Taille (en cm)")
+boxplot(data$`Poids (kg)`, main = "Weight (kg)")
+boxplot(data$`Taille (cm)`, main = "Heigt (cm)")
 
-kable(summary(data$Sexe) / 20, col.names = "Effectif", align = "c")
+kable(table(data$Sexe) / 20, col.names = c("Sexe", "Number"), align = "c")
 
-kable(table(data$Grossesses) / 20, col.names = c("Grossesses", "Effectifs"), align = "c")
+kable(table(data$Grossesses) / 20, col.names = c("Pregnancies", "Number"), align = "c")
 ```
 
 
