@@ -162,10 +162,9 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 </ul></li>
 <li><a href="#/iii---action-plan" id="/toc-iii---action-plan">III - Action plan</a>
 <ul>
-<li><a href="#/a-project-management" id="/toc-a-project-management">A) Project Management</a></li>
-<li><a href="#/b-data-cleaning" id="/toc-b-data-cleaning">B) Data cleaning</a></li>
-<li><a href="#/c-univariate-description" id="/toc-c-univariate-description">C) Univariate description</a></li>
-<li><a href="#/d-mfi-modelisation" id="/toc-d-mfi-modelisation">D) MFI modelisation</a></li>
+<li><a href="#/a-data-cleaning" id="/toc-a-data-cleaning">A) Data cleaning</a></li>
+<li><a href="#/b-univariate-description" id="/toc-b-univariate-description">B) Univariate description</a></li>
+<li><a href="#/c-mfi-modelisation" id="/toc-c-mfi-modelisation">C) MFI modelisation</a></li>
 </ul></li>
 <li><a href="#/iv---future-plan" id="/toc-iv---future-plan">IV - Future plan</a>
 <ul>
@@ -180,24 +179,26 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 <h2>I - Introdution</h2>
 
 </section>
-<section id="a-context" class="slide level3">
+<section id="a-context" class="slide level3 center">
 <h3>A) Context</h3>
+<p><br></p>
 <ul>
-<li>Patients with overactive immune systems awaiting transplantation have difficulties accepting the graft because of the antibodies rejecting the new organ.</li>
-<li>Desensitization protocols increases transplant candidates access to transplantation by decreasing HLA antibodies.</li>
-<li>By modeling the decrease of HLA antibodies, we can:
+<li><p>Patients with overactive immune systems awaiting transplantation have difficulties accepting the graft because of the antibodies rejecting the new organ. <br></p></li>
+<li><p>Desensitization protocols increases transplant candidates access to transplantation by decreasing HLA antibodies. <br></p></li>
+<li><p>By modeling the decrease of HLA antibodies, we can:</p>
 <ul>
 <li>improve treatment conditions and future patients access to transplantation;</li>
 <li>help patients not to do additional sessions when the immunity activity is already below a specific medical threshold</li>
 </ul></li>
 </ul>
 </section>
-<section id="b-objectives" class="slide level3">
+<section id="b-objectives" class="slide level3 center">
 <h3>B) Objectives</h3>
+<p><br></p>
 <ul>
-<li>Study the trends in the data</li>
-<li>Create proper modelling for each of the concerned antibodies</li>
-<li>Create an R shiny application for the clinicians to use our models</li>
+<li><p>Study the trends in the data <br></p></li>
+<li><p>Create proper modelling for each of the concerned antibodies <br></p></li>
+<li><p>Create an R shiny application for the clinicians to use our models</p></li>
 </ul>
 </section></section>
 <section>
@@ -205,10 +206,23 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 <h2>II - Data &amp; Methods</h2>
 
 </section>
-<section id="a-data-overview" class="slide level3">
+<section id="a-data-overview" class="slide level3 center">
 <h3>A) Data overview</h3>
+<p><br></p>
+<p>The dataset contains :<br>
+<br></p>
+<ul>
+<li><p>251 observations made on 10 individuals<br>
+<br></p></li>
+<li><p>34 variables :</p>
+<ul>
+<li>general informations about the treatment (date, beginning and ending time, …)</li>
+<li>clinical informatiosn about the treatment (major epitote, locus type, class I MFI, class II MFI, prescribed plasma volume, treated plasma volume, …)</li>
+<li>informations about the patient (ID, sex, age, height, weight, number of pregnancy, …)</li>
+</ul></li>
+</ul>
 </section>
-<section id="b-methods" class="slide level3">
+<section id="b-methods" class="slide level3 center">
 <h3>B) Methods</h3>
 </section></section>
 <section>
@@ -216,8 +230,39 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 <h2>III - Action plan</h2>
 
 </section>
-<section id="a-project-management" class="slide level3">
-<h3>A) Project Management</h3>
+<section id="a-data-cleaning" class="slide level3 center">
+<h3>A) Data cleaning</h3>
+<p>Our data is an Excel file database so there are a few problems we have to rectify :</p>
+<ul>
+<li>The variable names are quite difficult to exploit in R because they consists of two rows and small sentences, we changed them to simple one or two words names with a prefix when necessary</li>
+<li>Data is written manually, there are a some mistypes and errors</li>
+<li>There are missing values, including some we have to complete to be able to do proper modeling</li>
+<li>Some rows aren’t data and just additional information, we wanted to remove them</li>
+</ul>
+<p align="center">
+<img src="/images/Data_cleaning_schema.png" height="500" width="1100">
+</p>
+</section>
+<section id="b-univariate-description" class="slide level3 center">
+<h3>B) Univariate description</h3>
+<p>We spent the first part of our project analysing the variables one by one to understand our dataset and have a first idea of which vraiables could be of use in the next steps of our projects.</p>
+</section>
+<section id="c-mfi-modelisation" class="slide level3 center">
+<h3>C) MFI modelisation</h3>
+<p>Up to now, we have studied the variations of the MFI variables so we could have a first idea of how it is evolving and which method we could use to better predict its changes.</p>
+<p align="center" display="table-cell" vertical-align="middle">
+<img src="/images/MFIclasse1.png" height="500" width="600"> <img src="/images/MFIclasse2.png" height="500" width="600"> <img src="/images/MFIlegende.png" height="150" width="100">
+</p>
+<p>We are currently studying the Non Linear Mixed Modeling methods in order to understand how we could ugrade the models we already know.</p>
+</section></section>
+<section>
+<section id="iv---future-plan" class="title-slide slide level2 center">
+<h2>IV - Future plan</h2>
+
+</section>
+<section id="a-schedule-overview" class="slide level3 center">
+<h3>A) Schedule overview</h3>
+<p>Some of our remaining goals : - Find the most suitable model - Compare R’s and Monolix’s methods - Create a Shiny application</p>
 <div class="cell" data-reveal="true" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -228,29 +273,29 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
    dateFormat  DD-MM-YYYY
    section Analyse des données
    Data cleaning : a1, 23-10-2024, 45d
-   Structuration des données : a2, 23-10-2024, 45d
-   Analyse univariée : a3, 23-10-2024, 45d
-   Analyse bivariée : a4, after a3, 20d
-   Visualisation des données : a5, 23-10-2024, 45d
-   section Soutenance intermédiaire
-   Préparation diaporama : a6, 04-10-2024, 20-12-2024
-   Gestion de projet : a7, 21-10-2024, 20-12-2024
-   Entraînement oral : a8, 09-12-2024, 20-12-2024
+   Data formatting : a2, 23-10-2024, 45d
+   Univariate analyses : a3, 23-10-2024, 45d
+   Bivariate analyses : a4, after a3, 20d
+   Data vizualisation : a5, 23-10-2024, 45d
+   section Intermediate presentation
+   Support preparation : a6, 04-10-2024, 20-12-2024
+   Project Management : a7, 21-10-2024, 20-12-2024
+   Oral practice: a8, 09-12-2024, 20-12-2024
    section Modelisation
-   Exploration logiciel Monolix : a9, after a3  , 50d
-   Recherche de modèles sur R : a10, after a3, 50d
-   Etude bibliographique : a11, after a3, 100d
-   Modélisation des MFI : a12, after a9  , 50d
-   section Rapport final
-   Rédaction : a13, after a8, 90d
-   Cours sur les impacts du numériques : a14, after a3, 40d
-   Bilan carbone : a15, after a3, 100d
-   Relecture : a16, after a13, 30d
-   section Soutenance finale
-   Préparation diaporama : a19, after a8, 50d
-   Entraînement oral : a18, after a12, 30d
-   section Développement Shiny App
-   Construction de l'application : a19, after a12  , 30d
+   Monolix software exploration : a9, after a3  , 50d
+   R models research : a10, after a3, 50d
+   Bibliographical study : a11, after a3, 100d
+   MFI modelisation : a12, after a9  , 50d
+   section Final report
+   Redaction : a13, after a8, 90d
+   Numeric impacts course : a14, after a3, 40d
+   Carbon Footprint study : a15, after a3, 100d
+   Proofreading : a16, after a13, 30d
+   section Final presentation
+   Support preparation : a19, after a8, 50d
+   Oral practice : a18, after a12, 30d
+   section Shiny app developpment
+   Application construction : a19, after a12  , 30d
 </pre>
 </div>
 <p></p></figure><p></p>
@@ -258,27 +303,46 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 </div>
 </div>
 </section>
-<section id="b-data-cleaning" class="slide level3">
-<h3>B) Data cleaning</h3>
-</section>
-<section id="c-univariate-description" class="slide level3">
-<h3>C) Univariate description</h3>
-</section>
-<section id="d-mfi-modelisation" class="slide level3">
-<h3>D) MFI modelisation</h3>
-</section></section>
-<section>
-<section id="iv---future-plan" class="title-slide slide level2 center">
-<h2>IV - Future plan</h2>
-
-</section>
-<section id="a-schedule-overview" class="slide level3">
-<h3>A) Schedule overview</h3>
-</section>
-<section id="b-possible-scenarios" class="slide level3">
+<section id="b-possible-scenarios" class="slide level3 center">
 <h3>B) Possible scenarios</h3>
-
+<p>There are 3 possible outcomes for our project : - Best case : every task is done, the models and the shiny application - Most likely case : the modelisation is made but not the app - Worst case: the model created isn’t satisfying enough and the application isn’t done</p>
 </section></section>
+<section id="annexes" class="title-slide slide level2 center unlisted">
+<h2>Annexes</h2>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"quadrantChart": {"pointLabelFontSize": 10, 
+                            "pointTextPadding": 10,
+                            "pointRadius": 4}, 
+          "themeVariables": {"quadrant1Fill": "tomato",
+                             "quadrant2Fill": "orange", 
+                             "quadrant3Fill": "lightgreen", 
+                             "quadrant4Fill": "orange"}
+    }}%%
+quadrantChart
+    title Risk matrix
+    x-axis "Low consequences" --&gt; "High consequences"
+    y-axis "Low likelihood" --&gt; "High likelihood"
+    "Wrong files' versions": [0.25, 0.65]
+    "Missing students": [0.3, 0.9]
+    "Team conflicts": [0.9, 0.2]
+    "Changing in backers' needs": [0.85, 0.85]
+    "Delayed schedule": [0.6, 0.7]
+    "Files' loss": [0.65, 0.23]
+    "Legal issues (plagiarism)": [0.7, 0.12]
+    "Non functional study": [0.89, 0.07]
+    "Response fail": [0.9, 0.3]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+
+</section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <p><img src="images/Logo_UGA.png" class="slide-logo"></p>
@@ -367,7 +431,7 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
         disableLayout: false,
 
         // Vertical centering of slides
-        center: false,
+        center: true,
 
         // Enables touch navigation on devices with touch input
         touch: true,
@@ -463,9 +527,9 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
         // The "normal" size of the presentation, aspect ratio will be preserved
         // when the presentation is scaled to fit different resolutions. Can be
         // specified using percentage units.
-        width: 1050,
+        width: '150%',
 
-        height: 700,
+        height: '150%',
 
         // Factor of the display size that should remain empty around the content
         margin: 0.1,

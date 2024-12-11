@@ -1,14 +1,14 @@
-/* Changing style for the main page title */
+/* Changing style for the main page title. */
 .title {
     font-size: 70px !important;
 }
 
-/* Changing style for the main page authors*/
+/* Changing style for the main page authors. */
 .quarto-title-author-name {
     font-size: 40px;
 }
 
-/* Changing style for the main page date*/
+/* Changing style for the main page date. */
 .date {
     font-size: 40px;
     color: gray !important;
@@ -17,7 +17,13 @@
 /* For the style of the slides. */
 body {
     background-color: #d0e1fc;
-    font-size: small
+    font-size: small;
+}
+
+h1 {
+	text-align: center;
+	margin-top: 10px;
+	text-decoration: #000000  underline;
 }
 
 /* For the style of 2nd rank titles. */
