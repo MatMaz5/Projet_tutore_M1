@@ -155,16 +155,22 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 <li><a href="#/a-context" id="/toc-a-context">A) Context</a></li>
 <li><a href="#/b-objectives" id="/toc-b-objectives">B) Objectives</a></li>
 </ul></li>
-<li><a href="#/ii---data-methods" id="/toc-ii---data-methods">II - Data &amp; Methods</a>
+<li><a href="#/ii---data-overview" id="/toc-ii---data-overview">II - Data overview</a>
 <ul>
-<li><a href="#/a-data-overview" id="/toc-a-data-overview">A) Data overview</a></li>
-<li><a href="#/b-methods" id="/toc-b-methods">B) Methods</a></li>
+<li><a href="#/a-protocol" id="/toc-a-protocol">A) Protocol</a></li>
+<li><a href="#/b-data-description-longitudinal-data" id="/toc-b-data-description-longitudinal-data">B) Data description (longitudinal data)</a></li>
 </ul></li>
-<li><a href="#/iii---action-plan" id="/toc-iii---action-plan">III - Action plan</a>
+<li><a href="#/iii---methodology" id="/toc-iii---methodology">III - Methodology</a>
 <ul>
-<li><a href="#/a-data-cleaning" id="/toc-a-data-cleaning">A) Data cleaning</a></li>
-<li><a href="#/b-univariate-description" id="/toc-b-univariate-description">B) Univariate description</a></li>
-<li><a href="#/c-mfi-modelisation" id="/toc-c-mfi-modelisation">C) MFI modelisation</a></li>
+<li><a href="#/a-statistical-model" id="/toc-a-statistical-model">A) Statistical model</a></li>
+<li><a href="#/b-methods-and-tools" id="/toc-b-methods-and-tools">B) Methods and tools</a></li>
+<li><a href="#/c-strategy" id="/toc-c-strategy">C) Strategy</a>
+<ul>
+<li><a href="#/data-management" id="/toc-data-management">1. Data management</a></li>
+<li><a href="#/descriptive-statistics" id="/toc-descriptive-statistics">2. Descriptive statistics</a></li>
+<li><a href="#/mfi-modelisation" id="/toc-mfi-modelisation">3. MFI Modelisation</a></li>
+<li><a href="#/shiny-app" id="/toc-shiny-app">4. Shiny App</a></li>
+</ul></li>
 </ul></li>
 <li><a href="#/iv---future-plan" id="/toc-iv---future-plan">IV - Future plan</a>
 <ul>
@@ -179,41 +185,85 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 <h2>I - Introdution</h2>
 
 </section>
-<section id="a-context" class="slide level3 center">
+<section id="a-context" class="title-slide slide level3 center">
 <h3>A) Context</h3>
 <p><br></p>
 <ul>
-<li><p>Patients with overactive immune systems awaiting transplantation have difficulties accepting the graft because of the antibodies rejecting the new organ. <br></p></li>
-<li><p>Desensitization protocols increases transplant candidates access to transplantation by decreasing HLA antibodies. <br></p></li>
-<li><p>By modeling the decrease of HLA antibodies, we can:</p>
+<li>Patients with overactive immune systems awaiting transplantation have difficulties accepting the graft because of the antibodies rejecting the new organ.</li>
+</ul>
+<p><br></p>
+<ul>
+<li>Desensitization protocols increases transplant candidates access to transplantation by decreasing HLA antibodies.</li>
+</ul>
+<p><br></p>
+<ul>
+<li>By modeling the decrease of HLA antibodies, we can:
 <ul>
 <li>improve treatment conditions and future patients access to transplantation;</li>
 <li>help patients not to do additional sessions when the immunity activity is already below a specific medical threshold</li>
 </ul></li>
 </ul>
 </section>
-<section id="b-objectives" class="slide level3 center">
+
+<section id="b-objectives" class="title-slide slide level3 center">
 <h3>B) Objectives</h3>
 <p><br></p>
+<p>Very different immune profiles with great variability : <br></p>
 <ul>
-<li><p>Study the trends in the data <br></p></li>
-<li><p>Create proper modelling for each of the concerned antibodies <br></p></li>
-<li><p>Create an R shiny application for the clinicians to use our models</p></li>
+<li>HLA modelisation as a function of covariates</li>
 </ul>
-</section></section>
+<p><br></p>
+<ul>
+<li>Define optimized strategy of desensitization for patient</li>
+</ul>
+<p><br></p>
+<ul>
+<li>Create an R shiny application : visualize antibodies and the immune system complexity</li>
+</ul>
+</section>
+</section>
 <section>
-<section id="ii---data-methods" class="title-slide slide level2 center">
-<h2>II - Data &amp; Methods</h2>
+<section id="ii---data-overview" class="title-slide slide level2 center">
+<h2>II - Data overview</h2>
 
 </section>
-<section id="a-data-overview" class="slide level3 center">
-<h3>A) Data overview</h3>
+<section id="a-protocol" class="title-slide slide level3 center">
+<h3>A) Protocol</h3>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><br></p>
+<p>Data collection :</p>
+<p><br></p>
+<ul>
+<li>10 patients</li>
+</ul>
+<p><br></p>
+<ul>
+<li><p>10 desimmunisation seances :</p>
+<ul>
+<li><p>2 weeks, 5 days per week</p></li>
+<li><p>2 data collection time : before and after</p></li>
+<li><p>Def MFI</p></li>
+</ul></li>
+</ul>
+<p><br></p>
+<ul>
+<li>2 grandes classes d’anticorps</li>
+</ul>
+</div><div class="column" style="width:45%;">
+<p align="center">
+<img src="/images/Graph_data_overview.png" height="500" width="1100">
+</p>
+</div></div>
+</section>
+
+<section id="b-data-description-longitudinal-data" class="title-slide slide level3 center">
+<h3>B) Data description (longitudinal data)</h3>
 <p><br></p>
 <p>The dataset contains :<br>
 <br></p>
 <ul>
-<li><p>251 observations made on 10 individuals<br>
-<br></p></li>
+<li><p>251 observations made on 10 individuals <br></p></li>
 <li><p>34 variables :</p>
 <ul>
 <li>general informations about the treatment (date, beginning and ending time, …)</li>
@@ -221,48 +271,74 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 <li>informations about the patient (ID, sex, age, height, weight, number of pregnancy, …)</li>
 </ul></li>
 </ul>
+<p><br></p>
 </section>
-<section id="b-methods" class="slide level3 center">
-<h3>B) Methods</h3>
-</section></section>
+</section>
 <section>
-<section id="iii---action-plan" class="title-slide slide level2 center">
-<h2>III - Action plan</h2>
+<section id="iii---methodology" class="title-slide slide level2 center">
+<h2>III - Methodology</h2>
 
 </section>
-<section id="a-data-cleaning" class="slide level3 center">
-<h3>A) Data cleaning</h3>
-<p>Our data is an Excel file database so there are a few problems we have to rectify :</p>
+<section id="a-statistical-model" class="title-slide slide level3 center">
+<h3>A) Statistical model</h3>
+
+</section>
+
+<section id="b-methods-and-tools" class="title-slide slide level3 center">
+<h3>B) Methods and tools</h3>
+
+</section>
+
+<section id="c-strategy" class="title-slide slide level3 center">
+<h3>C) Strategy</h3>
+
+</section>
+<section id="data-management" class="slide level4 center">
+<h4>1. Data management</h4>
 <ul>
-<li>The variable names are quite difficult to exploit in R because they consists of two rows and small sentences, we changed them to simple one or two words names with a prefix when necessary</li>
-<li>Data is written manually, there are a some mistypes and errors</li>
-<li>There are missing values, including some we have to complete to be able to do proper modeling</li>
-<li>Some rows aren’t data and just additional information, we wanted to remove them</li>
+<li><p>Base file : Excel file</p></li>
+<li><p>What we want : csv file for easier work later</p></li>
+<li><p>How : 1st R program to rectify and structure data</p></li>
+<li><p>NA values handling : replaced by the mean value of the patient</p></li>
 </ul>
-<p align="center">
-<img src="/images/Data_cleaning_schema.png" height="500" width="1100">
-</p>
+<p>image de structure souhaitée</p>
+<!-- 
+- The variable names are quite difficult to exploit in R because they consists of two rows and small sentences,
+we changed them to simple one or two words names with a prefix when necessary
+- Data is written manually, there are a some mistypes and errors
+- There are missing values, including some we have to complete to be able to do proper modeling
+- Some rows aren't data and just additional information, we wanted to remove them
+
+<p align="center"> <img src="/images/Data_cleaning_schema.png"  height="500" width="1100"></p> -->
 </section>
-<section id="b-univariate-description" class="slide level3 center">
-<h3>B) Univariate description</h3>
-<p>We spent the first part of our project analysing the variables one by one to understand our dataset and have a first idea of which vraiables could be of use in the next steps of our projects.</p>
+<section id="descriptive-statistics" class="slide level4 center">
+<h4>2. Descriptive statistics</h4>
 </section>
-<section id="c-mfi-modelisation" class="slide level3 center">
-<h3>C) MFI modelisation</h3>
+<section id="mfi-modelisation" class="slide level4 center">
+<h4>3. MFI Modelisation</h4>
 <p>Up to now, we have studied the variations of the MFI variables so we could have a first idea of how it is evolving and which method we could use to better predict its changes.</p>
 <p align="center" display="table-cell" vertical-align="middle">
 <img src="/images/MFIclasse1.png" height="500" width="600"> <img src="/images/MFIclasse2.png" height="500" width="600"> <img src="/images/MFIlegende.png" height="150" width="100">
 </p>
 <p>We are currently studying the Non Linear Mixed Modeling methods in order to understand how we could ugrade the models we already know.</p>
-</section></section>
+</section>
+<section id="shiny-app" class="slide level4 center">
+<h4>4. Shiny App</h4>
+</section>
+</section>
 <section>
 <section id="iv---future-plan" class="title-slide slide level2 center">
 <h2>IV - Future plan</h2>
 
 </section>
-<section id="a-schedule-overview" class="slide level3 center">
+<section id="a-schedule-overview" class="title-slide slide level3 center">
 <h3>A) Schedule overview</h3>
-<p>Some of our remaining goals : - Find the most suitable model - Compare R’s and Monolix’s methods - Create a Shiny application</p>
+<p>Some of our remaining goals :</p>
+<ul>
+<li>Find the most suitable model</li>
+<li>Compare R’s and Monolix’s methods</li>
+<li>Create a Shiny application</li>
+</ul>
 <div class="cell" data-reveal="true" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -303,12 +379,19 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 </div>
 </div>
 </section>
-<section id="b-possible-scenarios" class="slide level3 center">
+
+<section id="b-possible-scenarios" class="title-slide slide level3 center">
 <h3>B) Possible scenarios</h3>
-<p>There are 3 possible outcomes for our project : - Best case : every task is done, the models and the shiny application - Most likely case : the modelisation is made but not the app - Worst case: the model created isn’t satisfying enough and the application isn’t done</p>
-</section></section>
-<section id="annexes" class="title-slide slide level2 center unlisted">
-<h2>Annexes</h2>
+<div class="columns">
+<div class="column" style="width:65%;">
+<p><br> There are 3 possible outcomes for our project :</p>
+<ul>
+<li>Best case : every task is done, the models and the shiny application</li>
+<li>Most likely case : the modelisation is made but not the app</li>
+<li>Worst case: the model created isn’t satisfying enough and the application isn’t done</li>
+</ul>
+</div><div class="column" style="width:35%;">
+<p><br> <br></p>
 <div class="cell" data-reveal="true" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -341,7 +424,9 @@ quadrantChart
 </div>
 </div>
 </div>
+</div></div>
 
+</section>
 </section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
