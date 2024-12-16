@@ -1,0 +1,234 @@
+---
+title: "Présentation anglais"
+output: html_document
+---
+
+```{r, echo = FALSE}
+setwd("/Users/matmaz/Master/GitHub/Projet_tutore_M1")
+```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(knitr)
+library(ggplot2)
+library(ggpubr)
+library(reshape2)
+library(dplyr)
+```
+
+
+Importation du nettoyage/ structuration :
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# Pour utiliser le code stocker dans un autre fichier :
+source("/Users/matmaz/Master/GitHub/Projet_tutore_M1/nettoyage_matthias.R")
+# /!\ : script R obligatoire (pas de Rmd)
+```
+
+
+# **Data overview**
+- Longitudinal data :
+  - 20 samples for each of the 10 patients.
+
+- **34** (pas sûr du nombre : recompter) variables : 
+  - variable à expliquée : MFI (Classe I et II)
+
+```{r}
+mfi <- as.data.frame(data[, c("C1.MFI", "C2.MFI")])
+
+mins <- c()
+med <- c()
+moy <- c()
+maxs <- c()
+
+for (i in 1:length(mfi)) {
+  mins[i] <- min(mfi[, i], na.rm = TRUE)
+  med[i] <- median(mfi[, i], na.rm = TRUE)
+  moy[i] <- mean(mfi[, i], na.rm = TRUE)
+  maxs[i] <- max(mfi[, i], na.rm = TRUE)
+}
+
+tab_mfi <- data.frame(Variables = c("Class I MFI", "Class II MFI"), Min = mins, Median = med, Mean = moy, Max = maxs)
+kable(tab_mfi, align = "r", digits = 2)
+```
+  
+  - covariables :
+    - Data about the treatment (noms des variables) ;
+
+```{r}
+tab_plasma <- data.frame(Variable = "Plasma treated volume", 
+                         Min = min(data$`Volume plasma traite`, na.rm = TRUE), 
+                         Median = median(data$`Volume plasma traite`, na.rm = TRUE), 
+                         Mean = mean(data$`Volume plasma traite`, na.rm = TRUE), 
+                         Max = max(data$`Volume plasma traite`, na.rm = TRUE))
+kable(tab_plasma, align = "r", digits = 2)
+```
+
+    - Data about the patient (noms des varialbes) (pregnancies between 0 and 4).
+
+```{r, echo = FALSE}
+par(mfrow = c(1, 2))
+boxplot(data$`Poids (kg)`, main = "Weight (kg)")
+boxplot(data$`Taille (cm)`, main = "Heigt (cm)")
+
+kable(table(data$Sexe) / 20, col.names = c("Sexe", "Number"), align = "c")
+```
+
+
+```{r}
+
+```
+
+
+
+
+# **Stat descriptives**
+```{r}
+data$C1.MFI_bool <- NA
+for (i in 1:nrow(data)) {
+  if (is.na(data$C1.MFI[i]) == FALSE) {
+    if ((data$C1.MFI[i] < 3000) == TRUE) {
+      data$C1.MFI_bool[i] <- 1
+    } else {
+      data$C1.MFI_bool[i] <- 0
+    }
+  }
+}
+tab_1 <- as.data.frame(table(data$C1.MFI_bool, data$Time)[2, ])
+colnames(tab_1) <- c("Number")
+
+data$C2.MFI_bool <- NA
+for (i in 1:nrow(data)) {
+  if (is.na(data$C2.MFI[i]) == FALSE) {
+    if ((data$C2.MFI[i] < 3000) == TRUE) {
+      data$C2.MFI_bool[i] <- 1
+    } else {
+      data$C2.MFI_bool[i] <- 0
+    }
+  }
+}
+tab_2 <- as.data.frame(table(data$C2.MFI_bool, data$Time)[2, ])
+colnames(tab_2) <- c("Number")
+```
+
+```{r, echo = FALSE, fig.align='center'}
+bp1 <- ggplot(data, aes(x = `Nom du Batch`, y = `Volume plasma traite`)) + 
+  geom_boxplot(na.rm = TRUE, fill = "lightgrey") +
+  labs(x = "Patients", y = "Plasma treated volume") + 
+  scale_x_discrete(labels = seq_along(unique(data$`Nom du Batch`))) +
+  theme_minimal() +   
+  theme(axis.title.x = element_text(color = "blue3", face = "bold"), 
+        axis.title.y = element_text(color = "blue3", face = "bold"))
+
+bp2 <- ggplot(data, aes(x = `Nom du Batch`, y = `Durée de la seance (min )`)) + 
+  geom_boxplot(na.rm = TRUE, fill = "lightgrey") + 
+  labs(x = "Patients", y = "Session duration (min)") + 
+  scale_x_discrete(labels = seq_along(unique(data$`Nom du Batch`))) +
+  theme_minimal() +   
+  theme(axis.title.x = element_text(color = "blue3", face = "bold"), 
+        axis.title.y = element_text(color = "blue3", face = "bold"))
+
+
+bp3 <- ggplot(tab_1, aes(x = 1:20, y = Number)) +
+  geom_bar(stat = "identity", color = "black", fill = "lightgrey") +
+  labs(x = "Session", y = "Patients below 3000 Class I MFI") +
+  theme_minimal() +   
+  theme(axis.title.x = element_text(color = "blue3", face = "bold"), 
+        axis.title.y = element_text(color = "blue3", face = "bold"))
+
+bp4 <- ggplot(tab_2, aes(x = 1:20, y = Number)) +
+  geom_bar(stat = "identity", color = "black", fill = "lightgrey") +
+  labs(x = "Session", y = "Patients below 3000 Class II MFI") +
+  theme_minimal() +   
+  theme(axis.title.x = element_text(color = "blue3", face = "bold"), 
+        axis.title.y = element_text(color = "blue3", face = "bold"))
+
+ggarrange(bp1, bp2, bp3, bp4, ncol = 2, nrow = 2)
+```
+
+
+Intéressants ? :
+```{r, echo = FALSE}
+bp2 <- ggplot(data, aes(x = Time, y = `Volume plasma traite`)) + 
+  geom_boxplot(na.rm = TRUE, fill = "lightgrey") +
+  xlab("Session") + ylab("Plasma treated volume") + 
+  scale_x_discrete(labels = seq_along(unique(data$Time))) +
+  theme_minimal() +   
+  theme(axis.title.x = element_text(color = "blue3", face = "bold"), 
+        axis.title.y = element_text(color = "blue3", face = "bold"))
+
+bp4 <- ggplot(data, aes(x = Time, y = `Durée de la seance (min )`)) + 
+  geom_boxplot(na.rm = TRUE, fill = "lightgrey") + 
+  xlab("Session") + ylab("Session duration (min)") + 
+  scale_x_discrete(labels = seq_along(unique(data$Time))) +
+  theme_minimal() +
+  theme(axis.title.x = element_text(color = "blue3", face = "bold"), 
+        axis.title.y = element_text(color = "blue3", face = "bold"))
+```
+
+
+
+
+# **Matrice des risques**
+Matrice et légende :
+```{r, echo = FALSE}
+# Paramètres de la matrice
+n <- 5
+p <- 5
+mat <- matrix(NA, nrow = n, ncol = p)
+rownames(mat) <- c("5", "4", "3", "2", "1")
+colnames(mat) <- c("1", "2", "3", "4", "5")
+
+
+# Transformer la matrice pour ggplot
+sur_mat <- melt(mat)
+colnames(sur_mat) <- c("Likelihood", "Consequence", "Impact")
+sur_mat <- mutate(sur_mat, Likelihood = as.numeric(as.character(Likelihood)),
+                  Consequence = as.numeric(as.character(Consequence)),
+                  Impact = Consequence + Likelihood)
+
+
+# Couleurs pour la matrice
+couleurs <- c("green", "green2", "yellow2", "orange", "red3")
+
+
+# Données des risques
+tags <- c("Non functional study", "Legal issues (plagiarism)", "Team conflicts", "Files' loss", "Response fail", 
+          "Wrong files' versions", "Missing students", "Delayed schedule", "Changing in backers' needs")
+x <- c(5, 4, 4.5, 3.5, 5, 2.5, 2, 3.5, 5)
+y <- c(1, 1, 1.5, 2, 2.5, 2.5, 4.5, 3.5, 5)
+data <- data.frame("Tags" = tags, "Consequence" = x, "Likelihood" = y)
+data <- mutate(data, Impact = Consequence + Likelihood, Numbers = 1:nrow(data))
+
+
+# Création de la matrice des risques
+mat_risk <- ggplot(sur_mat, aes(x = Consequence, y = Likelihood, fill = Impact)) + 
+  geom_tile(color = "white") +
+  scale_fill_gradientn(colours = couleurs, limits = c(0, 10)) + 
+  scale_x_continuous(breaks = 1:5, expand = c(0, 0)) + 
+  scale_y_continuous(breaks = 1:5, expand = c(0, 0)) + 
+  coord_fixed() +
+  theme_minimal() +
+  ggtitle("Risk Matrix") +
+  labs(x = "Consequence", y = "Likelihood") +
+  geom_point(data = data, aes(x = Consequence, y = Likelihood), color = "black", size = 3, pch = 18) +
+  geom_text(data = data, aes(x = Consequence, y = Likelihood, label = Numbers), 
+            hjust = 0.5, vjust = 2, size = 3, color = "black")
+mat_risk
+
+risks <- data[, c(5, 1)]
+kable(risks, align = "c")
+```
+
+Tableau des scénarios :
+```{r, echo = FALSE}
+# Création des données
+scenar <- data.frame(
+  Scenarios = c("Best", "Worst", "Most likely"),
+  Schedule = c("✓", "✗", "✓"),
+  Modelisation = c("✓", "✗", "✓"),
+  Protocol = c("✓", "✗", "~"),
+  Shiny = c("✓", "✗", "✗")
+)
+
+kable(scenar, align = "c")
+```
+
