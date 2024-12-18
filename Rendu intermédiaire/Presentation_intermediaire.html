@@ -162,13 +162,15 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 </ul></li>
 <li><a href="#/iii---methodology" id="/toc-iii---methodology">III - Methodology</a>
 <ul>
-<li><a href="#/a-statistical-model" id="/toc-a-statistical-model">A) Statistical model</a></li>
-<li><a href="#/b-methods-and-tools" id="/toc-b-methods-and-tools">B) Methods and tools</a></li>
-<li><a href="#/c-strategy" id="/toc-c-strategy">C) Strategy</a>
+<li><a href="#/a-statistical-model" id="/toc-a-statistical-model">A) Statistical model</a>
+<ul>
+
+</ul></li>
+<li><a href="#/b-strategy" id="/toc-b-strategy">B) Strategy</a>
 <ul>
 <li><a href="#/data-management" id="/toc-data-management">1. Data management</a></li>
 <li><a href="#/descriptive-statistics" id="/toc-descriptive-statistics">2. Descriptive statistics</a></li>
-<li><a href="#/mfi-modelisation" id="/toc-mfi-modelisation">3. MFI Modelisation</a></li>
+<li><a href="#/mfi-modelling" id="/toc-mfi-modelling">3. MFI modelling</a></li>
 <li><a href="#/shiny-app" id="/toc-shiny-app">4. Shiny App</a></li>
 </ul></li>
 </ul></li>
@@ -187,21 +189,16 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 </section>
 <section id="a-context" class="title-slide slide level3 center">
 <h3>A) Context</h3>
-<p><br></p>
+<p><br> 20 000 Patients waiting for transplantation in France<br>
+<br> Hyperimmune patients :<br>
+- HLA antibodies = Human Leukocyte Antigen, making the distinction between self and non-self cells</p>
 <ul>
-<li>Patients with overactive immune systems awaiting transplantation have difficulties accepting the graft because of the antibodies rejecting the new organ.</li>
-</ul>
-<p><br></p>
-<ul>
-<li>Desensitization protocols increases transplant candidates access to transplantation by decreasing HLA antibodies.</li>
-</ul>
-<p><br></p>
-<ul>
-<li>By modeling the decrease of HLA antibodies, we can:
-<ul>
-<li>improve treatment conditions and future patients access to transplantation;</li>
-<li>help patients not to do additional sessions when the immunity activity is already below a specific medical threshold</li>
-</ul></li>
+<li>more likely to reject transplatation<br>
+<br> Desensitivisation protocol :<br>
+</li>
+<li>decrease the number of anti-HLA antibodies<br>
+</li>
+<li>long and exhausting for patients</li>
 </ul>
 </section>
 
@@ -210,7 +207,7 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 <p><br></p>
 <p>Very different immune profiles with great variability : <br></p>
 <ul>
-<li>HLA modelisation as a function of covariates</li>
+<li>HLA modelling as a function of covariates</li>
 </ul>
 <p><br></p>
 <ul>
@@ -231,24 +228,18 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 <h3>A) Protocol</h3>
 <div class="columns">
 <div class="column" style="width:55%;">
-<p><br></p>
 <p>Data collection :</p>
 <p><br></p>
 <ul>
-<li>10 patients</li>
-</ul>
-<p><br></p>
-<ul>
-<li><p>10 desimmunisation seances :</p>
+<li><p>10 patients</p></li>
+<li><p>10 desimmunisation seances (immunoabsorptions) :</p>
 <ul>
 <li><p>2 weeks, 5 days per week</p></li>
-<li><p>2 data collection time : before and after</p></li>
-<li><p>Def MFI</p></li>
+<li><p>2 samples : before and after the seance</p></li>
+<li><p>Quantification of MFI : Mean Fluorescence Intensity, way of measuring anti-HLA presence in patients bodies</p></li>
+<li><p>Goal : MFI under the 3000 threshold</p></li>
 </ul></li>
-</ul>
-<p><br></p>
-<ul>
-<li>2 grandes classes d’anticorps</li>
+<li><p>Grouped into 2 classes of antibodies (CLASS 1 and CLASS 2), 2 MFI by sampling</p></li>
 </ul>
 </div><div class="column" style="width:45%;">
 <p align="center">
@@ -281,16 +272,28 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 </section>
 <section id="a-statistical-model" class="title-slide slide level3 center">
 <h3>A) Statistical model</h3>
+<p><br> Pharmacokinetics studies : study of the absorption, distribution, metabolism and excretion of a compound by an organism. <br> Non-linear mixed effects models :<br>
+- repeated measurements<br>
+- fixed and random effects<br>
+- small sample size<br>
+<br> Tools : Monolix@lixsoft and R</p>
+</section>
+<section class="slide level4 center">
 
+<p>Model :<br>
+<span class="math display">\[
+y_{i} = f(\phi_i, v_i)+\epsilon_i \quad , \quad i=1,...,M
+\]</span> <span class="math inline">\(M\)</span> number of patients<br>
+<span class="math inline">\(f\)</span> function of group specific parameters vector <span class="math inline">\(\phi_i\)</span> and covariate vector <span class="math inline">\(v_i\)</span><br>
+<span class="math inline">\(\phi_i = A_i \beta + B b_i\)</span> where <span class="math inline">\(\beta\)</span> is a vector of fixed effects and <span class="math inline">\(b_i\)</span> is a vectir of random effects associated with each patient<br>
+<span class="math inline">\(\epsilon_i\)</span> random variable describing residual error<br>
+<br> Parameters to estimate :<br>
+random/fixed effects <span class="math inline">\(\phi_i\)</span>, covariate vectir <span class="math inline">\(v_i\)</span> and residual error <span class="math inline">\(\epsilon_i\)</span><br>
+<br> Model validation, protocol simulation</p>
 </section>
 
-<section id="b-methods-and-tools" class="title-slide slide level3 center">
-<h3>B) Methods and tools</h3>
-
-</section>
-
-<section id="c-strategy" class="title-slide slide level3 center">
-<h3>C) Strategy</h3>
+<section id="b-strategy" class="title-slide slide level3 center">
+<h3>B) Strategy</h3>
 
 </section>
 <section id="data-management" class="slide level4 center">
@@ -300,6 +303,8 @@ BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo
 <li><p>What we want : csv file for easier work later</p></li>
 <li><p>How : 1st R program to rectify and structure data</p></li>
 <li><p>NA values handling : replaced by the mean value of the patient</p></li>
+<li><p>Seance duration recalculation : check the hand written value</p></li>
+<li><p>Adding delta MFI calcul</p></li>
 </ul>
 <p>image de structure souhaitée</p>
 <!-- 
@@ -314,13 +319,13 @@ we changed them to simple one or two words names with a prefix when necessary
 <section id="descriptive-statistics" class="slide level4 center">
 <h4>2. Descriptive statistics</h4>
 </section>
-<section id="mfi-modelisation" class="slide level4 center">
-<h4>3. MFI Modelisation</h4>
-<p>Up to now, we have studied the variations of the MFI variables so we could have a first idea of how it is evolving and which method we could use to better predict its changes.</p>
+<section id="mfi-modelling" class="slide level4 center">
+<h4>3. MFI modelling</h4>
 <p align="center" display="table-cell" vertical-align="middle">
 <img src="/images/MFIclasse1.png" height="500" width="600"> <img src="/images/MFIclasse2.png" height="500" width="600"> <img src="/images/MFIlegende.png" height="150" width="100">
 </p>
-<p>We are currently studying the Non Linear Mixed Modeling methods in order to understand how we could ugrade the models we already know.</p>
+<p><br> Class I MFI decreases at a good rate over time but classe II MFI seems to plateau.<br>
+Some patients reach the 3000 threshold quickly.</p>
 </section>
 <section id="shiny-app" class="slide level4 center">
 <h4>4. Shiny App</h4>
@@ -357,11 +362,11 @@ we changed them to simple one or two words names with a prefix when necessary
    Support preparation : a6, 04-10-2024, 20-12-2024
    Project Management : a7, 21-10-2024, 20-12-2024
    Oral practice: a8, 09-12-2024, 20-12-2024
-   section Modelisation
+   section modelling
    Monolix software exploration : a9, after a3  , 50d
    R models research : a10, after a3, 50d
    Bibliographical study : a11, after a3, 100d
-   MFI modelisation : a12, after a9  , 50d
+   MFI modelling : a12, after a9  , 50d
    section Final report
    Redaction : a13, after a8, 90d
    Numeric impacts course : a14, after a3, 40d
@@ -387,7 +392,7 @@ we changed them to simple one or two words names with a prefix when necessary
 <p><br> There are 3 possible outcomes for our project :</p>
 <ul>
 <li>Best case : every task is done, the models and the shiny application</li>
-<li>Most likely case : the modelisation is made but not the app</li>
+<li>Most likely case : the modelling is made but not the app</li>
 <li>Worst case: the model created isn’t satisfying enough and the application isn’t done</li>
 </ul>
 </div><div class="column" style="width:35%;">

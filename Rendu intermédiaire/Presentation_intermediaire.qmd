@@ -28,18 +28,16 @@ lang: "en"
 ## I - Introdution
 ### A) Context
 <br>
-
-- Patients with overactive immune systems awaiting transplantation have difficulties accepting the graft because of the antibodies rejecting the new organ.
-
+20 000 Patients waiting for transplantation in France  
 <br>
-
-- Desensitization protocols increases transplant candidates access to transplantation by decreasing HLA antibodies.
-
+Hyperimmune patients :  
+  - HLA antibodies = Human Leukocyte Antigen, making the distinction between self and non-self cells
+  
+  - more likely to reject transplatation  
 <br>
-
-- By modeling the decrease of HLA antibodies, we can:
-  - improve treatment conditions and future patients access to transplantation;
-  - help patients not to do additional sessions when the immunity activity is already below a specific medical threshold
+Desensitivisation protocol :  
+   - decrease the number of anti-HLA antibodies  
+   - long and exhausting for patients
 
 
 ### B) Objectives
@@ -48,7 +46,7 @@ lang: "en"
 Very different immune profiles with great variability :
 <br>
 
-- HLA modelisation as a function of covariates
+- HLA modelling as a function of covariates
 
 <br>
 
@@ -66,25 +64,23 @@ Very different immune profiles with great variability :
 
 ::: {.column width="55%"}
 
-Data collection :
-
 <br>
 
 - 10 patients
 
-<br>
 
-- 10 desimmunisation seances :
+- 10 desimmunisation seances (immunoabsorptions) :
 
   - 2 weeks, 5 days per week
 
-  - 2 data collection time : before and after
+  - 2 samples : before and after the seance
 
-  - MFI : Mean Fluorescence Intensity, way of measuring HLA presence in patients bodies
+  - Quantification of MFI : Mean Fluorescence Intensity, way of measuring anti-HLA presence in patients bodies
 
-<br>
+  - Goal : MFI under the 3000 threshold
 
-- 2 big categories of antibodies, 2 MFI by collection
+
+- Grouped into 2 classes of antibodies (CLASS 1 and CLASS 2), 2 MFI by sampling
 
 
 :::
@@ -115,20 +111,33 @@ The dataset contains :
 
 
 ## III - Methodology
-### A) Statistical model
 
-Pharmacokinetic models : how each patient's organism affects the MFI
-
+### A) Statistical model 
 <br>
+Pharmacokinetics studies : study of the absorption, distribution, metabolism and excretion of a compound by an organism.
+<br>
+Non-linear mixed effects models :  
+    - repeated measurements  
+    - fixed and random effects  
+    - small sample size  
+<br>
+Tools : Monolix@lixsoft and R
 
-Non-linear mixed effects models :
+---
 
-- repeated measurement
-- fixed and random effects
-- small sample size
- <br>
-
-Tools : Monolix Lixoft and R
+Model :  
+$$
+y_{i} = f(\phi_i, v_i)+\epsilon_i \quad , \quad i=1,...,M
+$$
+$M$ number of patients  
+$f$ function of group specific parameters vector $\phi_i$ and covariate vector $v_i$  
+$\phi_i = A_i \beta + B b_i$ where $\beta$ is a vector of fixed effects and $b_i$ is a vectir of random effects associated with each patient  
+$\epsilon_i$ random variable describing residual error  
+<br>
+Parameters to estimate :  
+random/fixed effects $\phi_i$, covariate vectir $v_i$ and residual error $\epsilon_i$  
+<br>
+Model validation, protocol simulation
 
 
 ### B) Strategy
@@ -159,13 +168,13 @@ we changed them to simple one or two words names with a prefix when necessary
 
 #### 2. Descriptive statistics
 
-#### 3. MFI Modelisation
-
-Up to now, we have studied the variations of the MFI variables so we could have a first idea of how it is evolving and which method we could use to better predict its changes.
+#### 3. MFI modelling
 
 <p align="center" display="table-cell" vertical-align="middle"> <img src="/images/MFIclasse1.png"  height="500" width="600"> <img src="/images/MFIclasse2.png"  height="500" width="600"> <img src="/images/MFIlegende.png"  height="150" width="100"> </p>
 
-We are currently studying the Non Linear Mixed Modeling methods in order to understand how we could ugrade the models we already know.
+<br>
+Class I MFI decreases at a good rate over time but classe II MFI seems to plateau.  
+Some patients reach the 3000 threshold quickly.
 
 #### 4. Shiny App
 
@@ -192,11 +201,11 @@ gantt
    Support preparation : a6, 04-10-2024, 20-12-2024
    Project Management : a7, 21-10-2024, 20-12-2024
    Oral practice: a8, 09-12-2024, 20-12-2024
-   section Modelisation
+   section modelling
    Monolix software exploration : a9, after a3  , 50d
    R models research : a10, after a3, 50d
    Bibliographical study : a11, after a3, 100d
-   MFI modelisation : a12, after a9  , 50d
+   MFI modelling : a12, after a9  , 50d
    section Final report
    Redaction : a13, after a8, 90d
    Numeric impacts course : a14, after a3, 40d
@@ -218,7 +227,7 @@ gantt
 There are 3 possible outcomes for our project :
 
 - Best case : every task is done, the models and the shiny application 
-- Most likely case : the modelisation is made but not the app
+- Most likely case : the modelling is made but not the app
 - Worst case: the model created isn't satisfying enough and the application isn't done 
 :::
 
