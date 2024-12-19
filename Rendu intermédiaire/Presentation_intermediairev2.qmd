@@ -1,0 +1,517 @@
+---
+title: "Modelling the desensitization in hyperimmuned patients awaiting transplantation"
+author: "BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo"
+date: 12/19/2024
+date-format: "DD MMMM YYYY"
+format:
+  revealjs: 
+    slide-number: true
+    chalkboard: 
+      buttons: false
+    preview-links: auto
+    logo: images/Logo_UGA.png
+    css: assets/style.css
+    toc: true
+    toc-depth: 4
+    resources: images
+    footer: "Tutored Project M1 SDS"
+    header-includes: |
+      <script src="assets/custom.js" type="application/javascript"></script>
+    slide-level: 4
+    responsive: TRUE
+    center: TRUE
+    width: 150%
+    height: 150%
+lang: "en"
+---
+
+## I - Introdution
+
+### A) Context
+
+* 20 000 patients waiting for transplantation in France  
+<br>
+
+* Hyperimmune patients :  
+  - **HLA antibodies :** Human Leukocyte Antigen, make the distinction between self and non-self cells  
+  
+  $\rightarrow$ more likely to reject transplantation  
+<br>
+
+* Desensitivisation protocol :  
+   - decrease the number of anti-HLA antibodies  
+   - long and exhausting for patients
+
+
+### B) Objectives
+<br>
+
+Very different immune profiles with great variability :
+<br>
+
+- HLA modelling as a function of covariates
+
+<br>
+
+-  Define optimized strategy of desensitization for patient
+
+<br>
+
+- Create an R shiny application : visualize antibodies and the immune system complexity
+
+
+## II - Data overview
+
+### A) Protocol
+:::: {.columns}
+
+::: {.column width="55%"}
+
+<br>
+
+- 10 patients
+
+
+- 10 desimmunisation seances (immunoabsorptions) :
+
+  - 2 weeks, 5 days per week
+
+  - 2 samples : before and after the seance
+
+  - Quantification of MFI : Mean Fluorescence Intensity, way of measuring anti-HLA presence in patients bodies
+
+  - Goal : MFI under the 3000 threshold
+
+
+- Grouped into 2 classes of antibodies (CLASS 1 and CLASS 2), 2 MFI by sampling
+
+
+:::
+
+::: {.column width="45%"}
+
+<p align="center"> <img src="/images/Graph_data_overview.png"  height="500" width="1100"></p>
+
+:::
+
+::::
+
+### B) Data description (longitudinal data)
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# Librairies
+install.packages("knitr")
+install.packages("kableExtra")
+library(knitr)
+library(kableExtra)
+
+# Données de nettoyage
+source("../nettoyage_matthias.R")
+    # pb de path réglé normalement
+
+
+# Netoyage général
+# data_net <- read.csv("../donnees_corrigees_CINEDESIM.csv")
+    # pas bon car pas mis en factor
+```
+
+
+- Longitudinal data: 20 samples for each of the 10 patients.
+  
+- Statistical unit: a patient.
+
+- Outcome variable:\  `MFI Classe I`\  and\  `MFI Classe II`
+
+```{r}
+mfi <- as.data.frame(data[, c("C1.MFI", "C2.MFI")])
+
+mins <- c()
+med <- c()
+moy <- c()
+maxs <- c()
+
+for (i in 1:length(mfi)) {
+  mins[i] <- min(mfi[, i], na.rm = TRUE)
+  med[i] <- median(mfi[, i], na.rm = TRUE)
+  moy[i] <- mean(mfi[, i], na.rm = TRUE)
+  maxs[i] <- max(mfi[, i], na.rm = TRUE)
+}
+
+tab_mfi <- data.frame(Variables = c("MFI Classe I", "MFI Classe II"), Min = mins, Median = med, Mean = moy, Max = maxs)
+kable(tab_mfi, align = "r", digits = 2)
+```
+
+
+
+
+### B) Data description
+
+- 8 selected covariates :\  `Time`,\  `Durée de la séance (min)`,\  `Volume plasma traité`,\  `Poids (kg)`,\  `Taille (cm)`,\  `Sexe`,\  `Grossesses`,\  `Greffe antérieure`.
+
+::: {.content-container style="display: flex; justify-content: space-between; align-items: flex-start;"}
+
+<div style="flex: 0.45; text-align: left;">
+
+```{r}
+var_quanti <- as.data.frame(data[, c("Durée de la seance (min )", "Volume plasma traite", 
+                                     "Poids (kg)", "Taille (cm)")])
+
+mins <- c()
+med <- c()
+moy <- c()
+maxs <- c()
+
+for (i in 1:length(var_quanti)) {
+  mins[i] <- min(var_quanti[, i], na.rm = TRUE)
+  med[i] <- median(var_quanti[, i], na.rm = TRUE)
+  moy[i] <- mean(var_quanti[, i], na.rm = TRUE)
+  maxs[i] <- max(var_quanti[, i], na.rm = TRUE)
+}
+
+tab_quanti <- data.frame(Variables = names(var_quanti), Min = mins, Median = med, Mean = round(moy, 1), Max = maxs)
+tab_quanti <- kable(tab_quanti, align = "r")
+kable_styling(tab_quanti, font_size = 25)
+```
+
+
+</div> <div style="flex: 0.45; text-align: left;">
+
+```{r}
+tab_sexe <- kable(table(data$Sexe) / 20, col.names = c("Sexe", "Number"), align = "r")
+kable_styling(tab_sexe, font_size = 25)
+```
+
+</div>
+:::
+
+::: {.content-container style="display: flex; justify-content: space-between; margin-top: 20px;"}
+
+<div style="flex: 0.45; text-align: left;">
+
+```{r}
+tab_greffe <- kable(table(data$`Greffe anterieur`) / 20, col.names = c("Previous transplants", "Number"), align = "r")
+kable_styling(tab_greffe, font_size = 25)
+```
+
+
+</div> <div style="flex: 0.45; text-align: left;">
+
+```{r}
+tab_gross <- kable(table(data$Grossesses) / 20, col.names = c("Pregnancies", "Number"), align = "r")
+kable_styling(tab_gross, font_size = 25)
+```
+
+</div>
+:::
+
+
+## III - Methodology
+
+### A) Statistical model 
+
+* based on pharmacometrics models :  
+  - pharmacokinetics (PK) models  
+  - pharmacodynamics (PD) models  
+<br>
+
+* Tools : Monolix@lixsoft (implimented PK/PM models) and R (lixoftConnectors, PKPDsin, nlmeODE packages)  
+<br>
+
+* Interests : 
+  - non-linear curves
+  - repeated measurements  
+  - explain the variability between patients   
+
+  $\rightarrow$ Non-linear mixed effects model
+
+### A) Statistical model {.unlisted}
+
+* Non-linear mixed effects models :  
+    $$ y_{i} = f(\phi_i, v_i)+\epsilon_i \quad , \quad i=1,...,M $$ 
+  - $M$ : number of patients  
+  - $f$ : non-linear function
+  - $\phi_i = A_i \beta + B b_i$ : group specific parameters vector  
+      + $\beta$ : a vector of fixed effects  
+      + $b_i$ : a vectir of random effects associated with patient i    
+  - $v_i$ : covariate vector 
+  - $\epsilon_i$ random variable describing residual error  
+<br>
+
+* Parameters to estimate : variance of random effects $b_i$, covariate vector $v_i$ and variance of residual error $\epsilon_i$  
+
+
+### B) Strategy
+Sous plan
+
+#### 1. Data management
+- Base file : Excel file
+
+- What we want : csv file for easier work later
+
+- How : 1st R program to rectify and structure data
+
+- NA values handling : replaced by the mean value of the patient
+
+- Seance duration recalculation : check the hand written value
+
+- Adding delta MFI calcul
+
+image de structure souhaitée
+
+<!-- 
+- The variable names are quite difficult to exploit in R because they consists of two rows and small sentences,
+we changed them to simple one or two words names with a prefix when necessary
+- Data is written manually, there are a some mistypes and errors
+- There are missing values, including some we have to complete to be able to do proper modeling
+- Some rows aren't data and just additional information, we wanted to remove them
+
+<p align="center"> <img src="/images/Data_cleaning_schema.png"  height="500" width="1100"></p> -->
+
+#### 2. Modeling
+<br>
+
+* Step 1 : function and covariates choice  
+<br>
+
+* Step 2 : parameters estimation  
+<br>
+
+*  Step 3 : validation of the model  
+<br>
+
+* Step 4 : simulation
+
+
+#### 3. Shiny App
+
+
+## III - First results
+
+<p align="center" display="table-cell" vertical-align="middle"> <img src="/images/MFIclasse1.png"  height="500" width="600"> <img src="/images/MFIclasse2.png"  height="500" width="600"> <img src="/images/MFIlegende.png"  height="150" width="100"> </p>
+
+<br>
+Class I MFI decreases at a good rate over time but classe II MFI seems to plateau.  
+Some patients reach the 3000 threshold quickly.
+
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(ggplot2)
+library(ggpubr)
+
+# Données de nettoyage
+source("../nettoyage_matthias.R")
+```
+
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+# Compter les patients < 3000 MFI à chaque séance
+data$C1.MFI_bool <- NA
+for (i in 1:nrow(data)) {
+  if (is.na(data$C1.MFI[i]) == FALSE) {
+    if ((data$C1.MFI[i] < 3000) == TRUE) {
+      data$C1.MFI_bool[i] <- 1
+    } else {
+      data$C1.MFI_bool[i] <- 0
+    }
+  }
+}
+tab_1 <- as.data.frame(table(data$C1.MFI_bool, data$Time)[2, ])
+colnames(tab_1) <- c("Number")
+
+data$C2.MFI_bool <- NA
+for (i in 1:nrow(data)) {
+  if (is.na(data$C2.MFI[i]) == FALSE) {
+    if ((data$C2.MFI[i] < 3000) == TRUE) {
+      data$C2.MFI_bool[i] <- 1
+    } else {
+      data$C2.MFI_bool[i] <- 0
+    }
+  }
+}
+tab_2 <- as.data.frame(table(data$C2.MFI_bool, data$Time)[2, ])
+colnames(tab_2) <- c("Number")
+```
+
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE, out.width = "75%"}
+# Combiner les graphes
+bp1 <- ggplot(data, aes(x = `Nom du Batch`, y = `Volume plasma traite`)) + 
+  geom_boxplot(na.rm = TRUE, fill = "lightgrey") +
+  labs(x = "Patients", y = "Plasma treated volume") + 
+  scale_x_discrete(labels = seq_along(unique(data$`Nom du Batch`))) +
+  theme_minimal() +   
+  theme(axis.title.x = element_text(color = "blue3", face = "bold", size = 8), 
+        axis.title.y = element_text(color = "blue3", face = "bold", size = 8),)
+
+bp2 <- ggplot(data, aes(x = `Nom du Batch`, y = `Durée de la seance (min )`)) + 
+  geom_boxplot(na.rm = TRUE, fill = "lightgrey") + 
+  labs(x = "Patients", y = "Session duration (min)") + 
+  scale_x_discrete(labels = seq_along(unique(data$`Nom du Batch`))) +
+  theme_minimal() +   
+  theme(axis.title.x = element_text(color = "blue3", face = "bold", size = 8), 
+        axis.title.y = element_text(color = "blue3", face = "bold", size = 8),)
+
+
+bp3 <- ggplot(tab_1, aes(x = 1:20, y = Number)) +
+  geom_bar(stat = "identity", fill = ifelse(1:20 %% 2 == 1, "lightcoral", "springgreen3")) +
+  labs(x = "Session", y = "Number of patients < 3000 Class I MFI") +
+  scale_y_continuous(limits = c(0, 10)) +
+  geom_vline(xintercept = 10.5, linetype = 2, color = "red3", size = 1) +
+  theme_minimal() +   
+  theme(axis.title.x = element_text(color = "blue3", face = "bold", size = 8), 
+        axis.title.y = element_text(color = "blue3", face = "bold", size = 8),)
+
+bp4 <- ggplot(tab_2, aes(x = 1:20, y = Number)) +
+  geom_bar(stat = "identity", fill = ifelse(1:20 %% 2 == 1, "lightcoral", "springgreen3")) +
+  labs(x = "Session", y = "Number of patients < 3000 Class II MFI", ) +
+  scale_y_continuous(limits = c(0, 10)) +
+  geom_vline(xintercept = 10.5, linetype = 2, color = "red3", size = 1) +
+  theme_minimal() +   
+  theme(axis.title.x = element_text(color = "blue3", face = "bold", size = 8), 
+        axis.title.y = element_text(color = "blue3", face = "bold", size = 8),)
+
+plot_f <- ggarrange(bp1, bp2, bp3, bp4, ncol = 2, nrow = 2)
+# plot_f
+
+# Pour sauvegarder en image 
+ggsave("stat_desc.png", plot = plot_f, width = 8, height = 5, path ="../Rendu intermédiaire/images")
+```
+
+<p align="center" display="table-cell" vertical-align="middle"> <img src="/images/stat_desc.png"  height="800" width="1500"> </p>
+
+## IV - Future plan
+### A) Schedule overview
+Some of our remaining goals :
+
+- Find the most suitable model
+- Compare R's and Monolix's methods
+- Create a Shiny application
+
+```{mermaid}
+gantt
+   title Gantt diagram
+   dateFormat  DD-MM-YYYY
+   section Analyse des données
+   Data cleaning : a1, 23-10-2024, 45d
+   Data formatting : a2, 23-10-2024, 45d
+   Univariate analyses : a3, 23-10-2024, 45d
+   Bivariate analyses : a4, after a3, 20d
+   Data vizualisation : a5, 23-10-2024, 45d
+   section Intermediate presentation
+   Support preparation : a6, 04-10-2024, 20-12-2024
+   Project Management : a7, 21-10-2024, 20-12-2024
+   Oral practice: a8, 09-12-2024, 20-12-2024
+   section modelling
+   Monolix software exploration : a9, after a3  , 50d
+   R models research : a10, after a3, 50d
+   Bibliographical study : a11, after a3, 100d
+   MFI modelling : a12, after a9  , 50d
+   section Final report
+   Redaction : a13, after a8, 90d
+   Numeric impacts course : a14, after a3, 40d
+   Carbon Footprint study : a15, after a3, 100d
+   Proofreading : a16, after a13, 30d
+   section Final presentation
+   Support preparation : a19, after a8, 50d
+   Oral practice : a18, after a12, 30d
+   section Shiny app developpment
+   Application construction : a19, after a12  , 30d
+```
+
+### B) Possible scenarios
+
+::: {.content-container style="display: flex; justify-content: space-around; align-items: flex-start;"}
+
+<div style="flex: 1;">
+  
+```{r}
+library(knitr)
+library(reshape2)
+library(dplyr)
+library(shadowtext)
+
+# Matrice des risques
+# Paramètres de la matrice
+n <- 5
+p <- 5
+mat <- matrix(NA, nrow = n, ncol = p)
+rownames(mat) <- c("5", "4", "3", "2", "1")
+colnames(mat) <- c("1", "2", "3", "4", "5")
+
+
+# Transformer la matrice pour ggplot
+sur_mat <- melt(mat)
+colnames(sur_mat) <- c("Likelihood", "Consequence", "Impact")
+sur_mat <- mutate(sur_mat, Likelihood = as.numeric(as.character(Likelihood)),
+                  Consequence = as.numeric(as.character(Consequence)),
+                  Impact = Consequence + Likelihood)
+
+
+# Couleurs pour la matrice
+couleurs <- c("green", "green2", "yellow2", "orange", "red3")
+
+
+# Données des risques
+tags <- c("Non functional study", "Legal issues (plagiarism)", "Team conflicts", "Files' loss", "Response fail", 
+          "Wrong files' versions", "Missing students", "Delayed schedule", "Changing in backers' needs")
+x <- c(5, 4, 4.5, 3.5, 5, 2.5, 2, 3.5, 5)
+y <- c(1, 1, 1.5, 2, 2.5, 2.5, 4.5, 3.5, 5)
+data <- data.frame("Tags" = tags, "Consequence" = x, "Likelihood" = y)
+data <- mutate(data, Impact = Consequence + Likelihood, Numbers = 1:nrow(data))
+
+
+# Création de la matrice des risques
+mat_risk <- ggplot(sur_mat, aes(x = Consequence, y = Likelihood, fill = Impact)) + 
+  geom_tile(color = "white") +
+  scale_fill_gradientn(colours = couleurs, limits = c(0, 10), guide = "none") + 
+  scale_x_continuous(breaks = 1:5, expand = c(0, 0)) + 
+  scale_y_continuous(breaks = 1:5, expand = c(0, 0)) + 
+  coord_fixed() +
+  theme_minimal() +
+  ggtitle("Risk Matrix") +
+  labs(x = "Consequence", y = "Likelihood") +
+  geom_point(data = data, aes(x = Consequence, y = Likelihood), color = "black", size = 3, pch = 18) +
+  geom_shadowtext(data = data, aes(x = Consequence, y = Likelihood, label = Numbers),
+                  hjust = 0.5, vjust = 1.5, color = "black", fontface = "bold", 
+                  size = 7, bg.colour = "white", bg.r = 0.1) +
+  theme(axis.title.x = element_text(face = "bold", size = 15), 
+        axis.title.y = element_text(face = "bold", size = 15),
+        title = element_text(face = "bold", size = 15))
+mat_risk
+```
+
+
+</div> <div style="flex: 1; text-align: center;">
+```{r, warning=FALSE}
+# Légende associée à côté
+library(kableExtra)
+
+risks <- data[, c(5, 1)]
+tab1 <- kable(risks, align = "r")
+kable_styling(tab1, font_size = 25)
+```
+
+</div>
+:::
+
+::: {.content-container style="margin-top: 20px; text-align: center;"}
+
+```{r}
+# Tableau (corrigé) en dessous
+scenar <- data.frame(c("Best", "Worst", "Most likely"),
+                     c("✓", "✓", "✓"),
+                     c("✓", "✓", "✓"),
+                     c("✓", "✗", "✓"),
+                     c("✓", "✗", "?"),
+                     c("✓", "✓", "✓"),
+                     c("✓", "✓", "✓"),
+                     c("✓", "✗", "✗"))
+
+colnames(scenar) <- c("Scenarios", "Data management", "Model choice", "Model optimisation", 
+                      "Protocol optimisation", "Needs charter", "App model", "App development")
+
+tab_scenar <- kable(scenar, align = "c")
+kable_styling(tab_scenar, font_size = 25)
+```
+
+:::
