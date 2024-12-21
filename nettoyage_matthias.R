@@ -1,4 +1,4 @@
-# setwd("/Users/matmaz/Master/GitHub/Projet_tutore_M1")
+setwd("/Users/matmaz/Master/GitHub/Projet_tutore_M1")
 
 
 # Librairies :
@@ -8,7 +8,7 @@ library(ggplot2)
 
 
 # Importation des données :
-data_brut <- read_excel("../data.xlsx", col_names = FALSE) 
+data_brut <- read_excel("/Users/matmaz/Master/GitHub/Projet_tutore_M1/data.xlsx", col_names = FALSE) 
 data <- data_brut
 
 

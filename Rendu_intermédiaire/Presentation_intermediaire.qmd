@@ -1,7 +1,8 @@
 ---
-title: "Modelling the desensitization in hyperimmuned patients awaiting transplantation"
+title: "Modelling the desensitization in hyperimmunised patients awaiting for kidney transplant"
+subtitle: "Tutor : BAZZOLI Caroline"
 author: "BREUZA Léonie, MAZET Matthias, OKADO Kento, VIGNAUD Enzo"
-date: 12/19/2024
+date: "`r Sys.Date()`"
 date-format: "DD MMMM YYYY"
 format:
   revealjs: 
@@ -25,88 +26,82 @@ format:
 lang: "en"
 ---
 
-## I - Introdution
+## I - Introduction
 
 ### A) Context
 
-* 20 000 patients waiting for transplantation in France  
 <br>
 
-* Hyperimmune patients :  
-  - **HLA antibodies :** Human Leukocyte Antigen, make the distinction between self and non-self cells  
-  
-  $\rightarrow$ more likely to reject transplantation  
-<br>
+-   **Human Leukocyte Antigen (HLA) antibodies :** make the distinction between self and non-self cells
 
-* Desensitivisation protocol :  
-   - decrease the number of anti-HLA antibodies  
-   - long and exhausting for patients
+-   **anti-HLA antibodies :** neutralize and destroy non-self cells\
+    <br>
 
+-   Hyperimmunised patients :
+
+    -   high proportion of anti-HLA antibodies\
+        $\rightarrow$ more likely to reject transplantation\
+        <br>
+
+-   Desensitivisation protocol :
+
+    -   decrease the number of anti-HLA antibodies\
+    -   long and heavy for patients
 
 ### B) Objectives
-<br>
-
-Very different immune profiles with great variability :
-<br>
-
-- HLA modelling as a function of covariates
 
 <br>
 
--  Define optimized strategy of desensitization for patient
-
+- Very different immune profiles with great variability : 
 <br>
 
-- Create an R shiny application : visualize antibodies and the immune system complexity
+  -   HLA modelling as a function of covariates
 
+
+  -   Define optimized strategy of desensitization for patient
+
+
+  -   Create an R shiny application : visualize antibodies and the immune system complexity
 
 ## II - Data overview
 
 ### A) Protocol
-:::: {.columns}
 
+::::: columns
 ::: {.column width="55%"}
-
 <br>
 
-- 10 patients
+-   10 patients
 
+-   10 desimmunisation session (immunoabsorptions) :
 
-- 10 desimmunisation seances (immunoabsorptions) :
+    -   2 weeks, 5 days per week
 
-  - 2 weeks, 5 days per week
+    -   2 samples : before and after the session
 
-  - 2 samples : before and after the seance
+    -   Quantification of MFI : Mean Fluorescence Intensity, way of measuring anti-HLA presence in patients bodies
 
-  - Quantification of MFI : Mean Fluorescence Intensity, way of measuring anti-HLA presence in patients bodies
-
-  - Goal : MFI under the 3000 threshold
-
-
-- Grouped into 2 classes of antibodies (CLASS 1 and CLASS 2), 2 MFI by sampling
-
-
+    -   Goal : MFI under the 3000 threshold
 :::
 
 ::: {.column width="45%"}
+<p align="center">
 
-<p align="center"> <img src="/images/Graph_data_overview.png"  height="500" width="1100"></p>
+<img src="/images/Graph_data_overview.png" height="500" width="1100"/>
 
+</p>
 :::
+:::::
 
-::::
-
-### B) Data description (longitudinal data)
+### B) Data description
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 # Librairies
-install.packages("knitr")
-install.packages("kableExtra")
 library(knitr)
 library(kableExtra)
 
 # Données de nettoyage
-source("../nettoyage_matthias.R")
+source("/Users/matmaz/Master/GitHub/Projet_tutore_M1/nettoyage_matthias.R")
     # pb de path réglé normalement
 
 
@@ -115,12 +110,11 @@ source("../nettoyage_matthias.R")
     # pas bon car pas mis en factor
 ```
 
+-   Longitudinal data: 20 samples for each of the 10 patients.
 
-- Longitudinal data: 20 samples for each of the 10 patients.
-  
-- Statistical unit: a patient.
+-   Statistical unit: a hyperimmunised patient waiting for a kidney transplant.
 
-- Outcome variable:\  `MFI Classe I`\  and\  `MFI Classe II`
+-   Outcome variable:  `MFI Classe I`  and  `MFI Classe II`
 
 ```{r}
 mfi <- as.data.frame(data[, c("C1.MFI", "C2.MFI")])
@@ -141,17 +135,12 @@ tab_mfi <- data.frame(Variables = c("MFI Classe I", "MFI Classe II"), Min = mins
 kable(tab_mfi, align = "r", digits = 2)
 ```
 
+### B) Data description {.unlisted}
 
+-   8 selected covariates :  `Time`,  `Durée de la séance (min)`,  `Volume plasma traité`,  `Poids (kg)`,  `Taille (cm)`,  `Sexe`,  `Grossesses`,  `Greffe antérieure`.
 
-
-### B) Data description
-
-- 8 selected covariates :\  `Time`,\  `Durée de la séance (min)`,\  `Volume plasma traité`,\  `Poids (kg)`,\  `Taille (cm)`,\  `Sexe`,\  `Grossesses`,\  `Greffe antérieure`.
-
-::: {.content-container style="display: flex; justify-content: space-between; align-items: flex-start;"}
-
-<div style="flex: 0.45; text-align: left;">
-
+::::: {.content-container style="display: flex; justify-content: space-between; align-items: flex-start;"}
+::: {style="flex: 0.45; text-align: left;"}
 ```{r}
 var_quanti <- as.data.frame(data[, c("Durée de la seance (min )", "Volume plasma traite", 
                                      "Poids (kg)", "Taille (cm)")])
@@ -172,92 +161,96 @@ tab_quanti <- data.frame(Variables = names(var_quanti), Min = mins, Median = med
 tab_quanti <- kable(tab_quanti, align = "r")
 kable_styling(tab_quanti, font_size = 25)
 ```
+:::
 
-
-</div> <div style="flex: 0.45; text-align: left;">
-
+::: {style="flex: 0.45; text-align: left;"}
 ```{r}
 tab_sexe <- kable(table(data$Sexe) / 20, col.names = c("Sexe", "Number"), align = "r")
 kable_styling(tab_sexe, font_size = 25)
 ```
-
-</div>
 :::
+:::::
 
-::: {.content-container style="display: flex; justify-content: space-between; margin-top: 20px;"}
-
-<div style="flex: 0.45; text-align: left;">
-
+::::: {.content-container style="display: flex; justify-content: space-between; margin-top: 20px;"}
+::: {style="flex: 0.45; text-align: left;"}
 ```{r}
-tab_greffe <- kable(table(data$`Greffe anterieur`) / 20, col.names = c("Previous transplants", "Number"), align = "r")
+tab_greffe <- kable(table(data$`Greffe anterieur`) / 20, col.names = c("Greffe antérieure", "Number"), align = "r")
 kable_styling(tab_greffe, font_size = 25)
 ```
-
-
-</div> <div style="flex: 0.45; text-align: left;">
-
-```{r}
-tab_gross <- kable(table(data$Grossesses) / 20, col.names = c("Pregnancies", "Number"), align = "r")
-kable_styling(tab_gross, font_size = 25)
-```
-
-</div>
 :::
 
+::: {style="flex: 0.45; text-align: left;"}
+```{r}
+tab_gross <- kable(table(data$Grossesses) / 20, col.names = c("Grossesses", "Number"), align = "r")
+kable_styling(tab_gross, font_size = 25)
+```
+:::
+:::::
 
 ## III - Methodology
 
-### A) Statistical model 
+```{r}
+setwd('/Users/matmaz/Master/GitHub/Projet_tutore_M1/Rendu_intermédiaire')
+```
 
-* based on pharmacometrics models :  
-  - pharmacokinetics (PK) models  
-  - pharmacodynamics (PD) models  
-<br>
+### A) Statistical model
 
-* Tools : Monolix@lixsoft (implimented PK/PM models) and R (lixoftConnectors, PKPDsin, nlmeODE packages)  
-<br>
+-   Based on pharmacometrics models :
 
-* Interests : 
-  - non-linear curves
-  - repeated measurements  
-  - explain the variability between patients   
+    -   pharmacokinetics (PK) models\
+    -   pharmacodynamics (PD) models\
+        <br>
 
-  $\rightarrow$ Non-linear mixed effects model
+-   Tools : Monolix\@lixoft (implimented PK/PD models) and R (lixoftConnectors, PKPDsin, nlmeODE packages)\
+    <br>
+
+-   Interests :
+
+    -   non-linear curves
+    -   repeated measurements\
+    -   explain the variability between patients
+
+    $\rightarrow$ Non-linear mixed effects model
 
 ### A) Statistical model {.unlisted}
 
-* Non-linear mixed effects models :  
-    $$ y_{i} = f(\phi_i, v_i)+\epsilon_i \quad , \quad i=1,...,M $$ 
-  - $M$ : number of patients  
-  - $f$ : non-linear function
-  - $\phi_i = A_i \beta + B b_i$ : group specific parameters vector  
-      + $\beta$ : a vector of fixed effects  
-      + $b_i$ : a vectir of random effects associated with patient i    
-  - $v_i$ : covariate vector 
-  - $\epsilon_i$ random variable describing residual error  
-<br>
-
-* Parameters to estimate : variance of random effects $b_i$, covariate vector $v_i$ and variance of residual error $\epsilon_i$  
-
+-   Non-linear mixed effects models :\
+    $$ y_{i} = f(\phi_i, v_i)+\epsilon_i \quad , \quad i=1,...,M $$
+    -   $M$ : number of patients\
+    -   $f$ : non-linear function
+    -   $\phi_i = A_i \beta + B b_i$ : group specific parameters vector
+        -   $\beta$ : a vector of fixed effects\
+        -   $b_i$ : a vectir of random effects associated with patient i\
+    -   $v_i$ : covariate vector
+    -   $\epsilon_i$ random variable describing residual error\
+        <br>
+-   Parameters to estimate : variance of random effects $b_i$, covariate vector $v_i$ and variance of residual error $\epsilon_i$
 
 ### B) Strategy
-Sous plan
 
 #### 1. Data management
-- Base file : Excel file
 
-- What we want : csv file for easier work later
+<br>
 
-- How : 1st R program to rectify and structure data
+-   Base file : Excel file\
+    <br>
 
-- NA values handling : replaced by the mean value of the patient
+-   What we want : csv file for easier work later\
+    <br>
 
-- Seance duration recalculation : check the hand written value
+-   How : 1st R program to rectify and structure data\
+    <br>
 
-- Adding delta MFI calcul
+-   NA values handling : replaced by the mean value of the patient\
+    <br>
 
-image de structure souhaitée
+-   Seance duration recalculation : check the hand written value\
+    <br>
 
+-   Adding delta MFI calcul\
+    <br>
+
+```{=html}
 <!-- 
 - The variable names are quite difficult to exploit in R because they consists of two rows and small sentences,
 we changed them to simple one or two words names with a prefix when necessary
@@ -266,33 +259,9 @@ we changed them to simple one or two words names with a prefix when necessary
 - Some rows aren't data and just additional information, we wanted to remove them
 
 <p align="center"> <img src="/images/Data_cleaning_schema.png"  height="500" width="1100"></p> -->
+```
 
-#### 2. Modeling
-<br>
-
-* Step 1 : function and covariates choice  
-<br>
-
-* Step 2 : parameters estimation  
-<br>
-
-*  Step 3 : validation of the model  
-<br>
-
-* Step 4 : simulation
-
-
-#### 3. Shiny App
-
-
-## III - First results
-
-<p align="center" display="table-cell" vertical-align="middle"> <img src="/images/MFIclasse1.png"  height="500" width="600"> <img src="/images/MFIclasse2.png"  height="500" width="600"> <img src="/images/MFIlegende.png"  height="150" width="100"> </p>
-
-<br>
-Class I MFI decreases at a good rate over time but classe II MFI seems to plateau.  
-Some patients reach the 3000 threshold quickly.
-
+#### 2. Descriptive statistics
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 library(ggplot2)
@@ -301,7 +270,6 @@ library(ggpubr)
 # Données de nettoyage
 source("../nettoyage_matthias.R")
 ```
-
 
 ```{r, echo = FALSE, warning = FALSE, message = FALSE}
 # Compter les patients < 3000 MFI à chaque séance
@@ -332,7 +300,6 @@ tab_2 <- as.data.frame(table(data$C2.MFI_bool, data$Time)[2, ])
 colnames(tab_2) <- c("Number")
 ```
 
-
 ```{r, echo = FALSE, warning = FALSE, message = FALSE, out.width = "75%"}
 # Combiner les graphes
 bp1 <- ggplot(data, aes(x = `Nom du Batch`, y = `Volume plasma traite`)) + 
@@ -354,7 +321,7 @@ bp2 <- ggplot(data, aes(x = `Nom du Batch`, y = `Durée de la seance (min )`)) +
 
 bp3 <- ggplot(tab_1, aes(x = 1:20, y = Number)) +
   geom_bar(stat = "identity", fill = ifelse(1:20 %% 2 == 1, "lightcoral", "springgreen3")) +
-  labs(x = "Session", y = "Number of patients < 3000 Class I MFI") +
+  labs(x = "Sample", y = "Number of patients < 3000 Class I MFI") +
   scale_y_continuous(limits = c(0, 10)) +
   geom_vline(xintercept = 10.5, linetype = 2, color = "red3", size = 1) +
   theme_minimal() +   
@@ -363,7 +330,7 @@ bp3 <- ggplot(tab_1, aes(x = 1:20, y = Number)) +
 
 bp4 <- ggplot(tab_2, aes(x = 1:20, y = Number)) +
   geom_bar(stat = "identity", fill = ifelse(1:20 %% 2 == 1, "lightcoral", "springgreen3")) +
-  labs(x = "Session", y = "Number of patients < 3000 Class II MFI", ) +
+  labs(x = "Sample", y = "Number of patients < 3000 Class II MFI", ) +
   scale_y_continuous(limits = c(0, 10)) +
   geom_vline(xintercept = 10.5, linetype = 2, color = "red3", size = 1) +
   theme_minimal() +   
@@ -374,56 +341,112 @@ plot_f <- ggarrange(bp1, bp2, bp3, bp4, ncol = 2, nrow = 2)
 # plot_f
 
 # Pour sauvegarder en image 
-ggsave("stat_desc.png", plot = plot_f, width = 8, height = 5, path ="../Rendu intermédiaire/images")
+ggsave("stat_desc.png", plot = plot_f, width = 8, height = 5, path ="../Rendu_intermédiaire/images")
 ```
 
-<p align="center" display="table-cell" vertical-align="middle"> <img src="/images/stat_desc.png"  height="800" width="1500"> </p>
+<p align="center" display="table-cell" vertical-align="middle">
+
+<img src="/images/stat_desc.png" height="800" width="1500"/>
+
+</p>
+
+#### 3. MFI visualisation
+
+<p align="center" display="table-cell" vertical-align="middle">
+
+<img src="/Images/image_plotMFIclasse1.png" height="700" width="800"/> <img src="/Images/image_plotMFIclasse2.png" height="700" width="800"/>
+
+</p>
+
+Gap half way through the treatment because of weekend break.\
+Some patients reach the 3000 threshold quickly.
+
+#### 
+
+-   Delta of MFI : difference of MFI between the beginning and the end of a session.
+
+-   Visualisation of the delta of MFI
+
+<p align="center" display="table-cell" vertical-align="middle">
+
+<img src="/Images/image_deltaMFIclasse1.png" height="700" width="850"/> <img src="/Images/image_deltaMFIclasse2.png" height="700" width="850"/>
+
+</p>
+
+#### 4. Modelling
+
+<br>
+
+-   Step 1 : function and covariates choice\
+    <br>
+
+-   Step 2 : parameters estimation\
+    <br>
+
+-   Step 3 : validation of the model\
+    <br>
+
+-   Step 4 : simulation
+
+#### 5. Shiny App
+
+<br>
+
+-   Objective : visualize all the different anti-HLA
+
+    -   Because of the great variability
+    
+        -   Difficulties in visualising the different models
+        
+    <br>
+
+-   Several stages :
+
+    -   Defining the client's needs and expectations
+
+    -   Creating a mock-up
+
+    -   Development of the shiny application
 
 ## IV - Future plan
-### A) Schedule overview
-Some of our remaining goals :
 
-- Find the most suitable model
-- Compare R's and Monolix's methods
-- Create a Shiny application
+### A) Schedule overview
 
 ```{mermaid}
 gantt
-   title Gantt diagram
-   dateFormat  DD-MM-YYYY
-   section Analyse des données
-   Data cleaning : a1, 23-10-2024, 45d
-   Data formatting : a2, 23-10-2024, 45d
-   Univariate analyses : a3, 23-10-2024, 45d
-   Bivariate analyses : a4, after a3, 20d
-   Data vizualisation : a5, 23-10-2024, 45d
-   section Intermediate presentation
-   Support preparation : a6, 04-10-2024, 20-12-2024
-   Project Management : a7, 21-10-2024, 20-12-2024
-   Oral practice: a8, 09-12-2024, 20-12-2024
-   section modelling
-   Monolix software exploration : a9, after a3  , 50d
-   R models research : a10, after a3, 50d
-   Bibliographical study : a11, after a3, 100d
-   MFI modelling : a12, after a9  , 50d
-   section Final report
-   Redaction : a13, after a8, 90d
-   Numeric impacts course : a14, after a3, 40d
-   Carbon Footprint study : a15, after a3, 100d
-   Proofreading : a16, after a13, 30d
-   section Final presentation
-   Support preparation : a19, after a8, 50d
-   Oral practice : a18, after a12, 30d
-   section Shiny app developpment
-   Application construction : a19, after a12  , 30d
+  title Gantt diagram
+  dateFormat  DD-MM-YYYY
+  section Data appropriation
+  Data cleaning : a1, 23-10-2024, 45d
+  Data structuring : a2, 23-10-2024, 45d
+  Univariate analysis : a3, 23-10-2024, 45d
+  Bivariate analysis : a4, after a3, 20d
+  Data visualisation : a5, 23-10-2024, 45d
+  section Intermediate defence
+  Slide show preparation : a6, 04-10-2024, 20-12-2024
+  Defence training : a8, 01-12-2024, 20-12-2024
+  section Modelling
+  Exploring Monolix software : a9, after a3  , 50d
+  Searching for models in R : a10, after a3, 100d
+  Bibliographical study : a11, after a3, 100d
+  MFI modelling : a12, after a3  ,100d
+  Shiny App development : a19, after a3 , 100d
+  section Final report
+  Writing : a13, after a8, 90d
+  Course on the impact of digital technology : a14, after a3, 40d
+  Carbon footprint : a15, after a3, 100d
+  Proofreading : a16, after a13, 30d
+  section Final defence
+  Slide show preparation : a19, after a14, 50d
+  Defence training : a18, after a12, 30d
+  section Project management
+  Project management : a7, 21-10-2024, 20-04-2025
 ```
 
 ### B) Possible scenarios
 
-::: {.content-container style="display: flex; justify-content: space-around; align-items: flex-start;"}
-
-<div style="flex: 1;">
-  
+::::: {.content-container style="display: flex; justify-content: space-around; align-items: flex-start;"}
+::: {style="flex: 1;"}
 ```{r}
 library(knitr)
 library(reshape2)
@@ -479,9 +502,9 @@ mat_risk <- ggplot(sur_mat, aes(x = Consequence, y = Likelihood, fill = Impact))
         title = element_text(face = "bold", size = 15))
 mat_risk
 ```
+:::
 
-
-</div> <div style="flex: 1; text-align: center;">
+::: {style="flex: 1; text-align: center;"}
 ```{r, warning=FALSE}
 # Légende associée à côté
 library(kableExtra)
@@ -490,12 +513,10 @@ risks <- data[, c(5, 1)]
 tab1 <- kable(risks, align = "r")
 kable_styling(tab1, font_size = 25)
 ```
-
-</div>
 :::
+:::::
 
 ::: {.content-container style="margin-top: 20px; text-align: center;"}
-
 ```{r}
 # Tableau (corrigé) en dessous
 scenar <- data.frame(c("Best", "Worst", "Most likely"),
@@ -508,10 +529,9 @@ scenar <- data.frame(c("Best", "Worst", "Most likely"),
                      c("✓", "✗", "✗"))
 
 colnames(scenar) <- c("Scenarios", "Data management", "Model choice", "Model optimisation", 
-                      "Protocol optimisation", "Needs charter", "App model", "App development")
+                      "Protocol optimisation", "Needs charter", "App mock-up", "App development")
 
 tab_scenar <- kable(scenar, align = "c")
 kable_styling(tab_scenar, font_size = 25)
 ```
-
 :::
