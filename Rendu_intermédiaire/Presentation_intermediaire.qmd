@@ -369,7 +369,7 @@ Some patients reach the 3000 threshold quickly.
 
 <p align="center" display="table-cell" vertical-align="middle">
 
-<img src="/Images/image_deltaMFIclasse1.png" height="700" width="850"/> <img src="/Images/image_deltaMFIclasse2.png" height="700" width="850"/>
+<img src="/Images/image_deltaMFIclasse1.png" height="500" width="650"/> <img src="/Images/image_deltaMFIclasse2.png" height="500" width="650"/>
 
 </p>
 
