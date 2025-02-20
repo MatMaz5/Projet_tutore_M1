@@ -1,0 +1,131 @@
+---
+title: "***Rapport de projet tutoré***"
+author: "Matthias MAZET, Enzo VIGNAUD, Kento OKADO, Léonie BREUZA"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+geometry: margin = 1.8 cm
+---
+
+
+```{r, echo = FALSE}
+# Packages
+```
+
+
+\newpage
+
+
+
+- Table des matières à laisser ?
+
+
+
+\newpage
+
+
+
+# **Context**
+
+  - Général : \
+Patients en sur immunité **et** en attente de greffe de rein = pb car très compliqué pour que la greffe fonctionne. \
+Cause de rejet = anticorps anti-HLA (détails ?). \
+Quantification des anticorps : MFI (réparties en Classe I et II). \
+
+  - Protocole actuel : \
+10 séances de désimmunisation réparties sur 2 semaines avec une pause le week-end (schéma classique). \
+Objectif des séances : passer en dessous des 3 000 MFI (norme pour Grenoble)(2 000 au niveau national). \
+
+  - But du projet : \
+Modéliser la baisse des MFI => alléger l'impact que le protocole actuel a sur les patients.
+
+  - Différents acteurs : \
+Caroline BAZZOLI ; Céline DIARD ; Johan NOBLE. (Nous ?)
+
+
+
+# **Méthodes**
+### *Données*
+10 patients
+Longitudinales (20 données/patients sur 2 semaines avec une pause). \
+Variables cibles : MFI Classe I et II (variables quanti continues). \
+Covariables : toutes les détailler ou attendre la fin pour ne mettre que celles sélectionnées ? \
+*(Cf présentation intermédiaire pour compléter/vérifier qu'il ne manque rien.)*
+
+```{r}
+# Nettoyage des données ici ?
+```
+
+
+### *Protocole*
+Protocole actuel : \
+10 séances de désimmunisation réparties sur 2 semaines avec une pause le week-end (schéma classique). \
+Objectif des séances : passer en dessous des 3 000 MFI (norme pour Grenoble)(2 000 au niveau national). \
+Séance : prise du taux de MFI au début de la séance ; passage du plasma dans des colonnes de désimmunisation ; prise du taux de MFI à la fin de la séance. \
+
+
+### *Analyses statistiques*
+Outils utilisés : R et Monolix.
+
+Stat univariées/bivariées : pourquoi faire ? Sur quoi en faire ?
+
+Descriptions des modèles statistiques (application + formule) :
+
+  - modèles K-PD.
+  
+  - modèles TGI.
+
+Simulation des protocoles ?
+
+
+# **Résultats**
+Quoi mettre où entre ici et la partie "Méthodes - Analyses statistiques" ?
+
+Profils des patients (taille, âge, sexe, grossesses, etc.)
+```{r}
+# Graphiques pertinents
+```
+
+Résultats des modèles (graphiques + indices de qualité/comparaison) :
+
+  - modèles K-PD.
+  
+  - modèles TGI.
+
+Meilleur modèle : lequel et pourquoi.
+
+
+# **Discussion/Conclusion** 
+Rappel l'objectif de l'étude et les principaux résultats obtenus. 
+
+Limites de l'étude (hypothèses, a priori...). \
+  - Pas assez de patients/données ? \
+  - Compréhension du système immunitaire encore trop limité ? \
+
+Ouverture : qu'est-ce que l'on pourrait faire par la suite ? \
+  - Améliorer la précision des prélèvements ?
+
+
+
+# **Impact Environnemental et Sociétal**
+Cf site et pdf sur Moodle.
+
+### *Impact environnemental personnel*
+- Trajets domicile-travail et autres déplacements.
+
+- Consommation des équipements utilisés (ordinateur fixe ou portable, temps d'utilisation serveur, etc.).
+
+- Autres impacts ?
+
+
+### *Impact global du projet*
+##### Impact environnemental
+
+
+##### Impact sociétal
+
+
+### *Politique de la structure d'accueil*
+Pas pour le projet tutoré. (?)
+
