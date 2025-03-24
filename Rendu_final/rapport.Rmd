@@ -52,7 +52,7 @@ Nous avons travaillé à partir de données longitudinales prélevées sur dix p
   
 |**Nom**|**Description**|**Type/Modalités**|
 |-----:|----------:|-----:|
-|`Durée de la séance (min)`|Durée de la séance **= durée du tratiement du plasma ?** (en min)|Continue|
+|`Durée de la séance (min)`|Durée de la séance **= durée du traitement du plasma ?** (en min)|Continue|
 |`Volume plasma traité`|Volume de plasma traité lors de la séance d'immunoabsorption en question. (en mL)|Continue|
 |`Poids (kg)`|Poids du patient lors de la séance. (en kg)|Continue|
 |`Taille (cm)`|Taille du patient lors de la séance. (en cm)|Continue|
