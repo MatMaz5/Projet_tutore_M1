@@ -8,6 +8,7 @@
 
 # Chargement :
 library(ggplot2)
+library(GGally)
 
 ## Importation des données
 data <- read.csv("donnees_corrigees_CINEDESIM.csv", header = TRUE, encoding = "UTF-8")[-1]
@@ -24,6 +25,8 @@ data$semaine <- factor(data$semaine, labels = c("Semaine 1", "Semaine 2"))
 
 # Passage des variables quanti de caractère à numérique :
 data$poids <- as.double(data$poids)
+data$vol_pla_prescrit <- as.integer(data$vol_pla_prescrit)
+data$vol_pla_traite <- as.integer(data$vol_pla_traite)
 
 # Séparation en jeux de données par patient
 liste_patients <- list()
@@ -54,27 +57,8 @@ graph_MFI2 <-  ggplot(data, aes(x = temps, y = C2.MFI, group=as.factor(nom_batch
 graph_MFI2
 
 # Delta MFI
-# Calcul des delta
-delta_MFI = function(df) {
-  delta1 = numeric(20)
-  delta2 = numeric(20)
-  for (i in 1:10){
-    delta1[2*i-1] <- df$C1.MFI[2*i] - df$C1.MFI[2*i-1]
-    delta1[2*i] <- df$C1.MFI[2*i] - df$C1.MFI[2*i-1]
-    delta2[2*i-1] <- df$C2.MFI[2*i] - df$C2.MFI[2*i-1]
-    delta2[2*i] <- df$C2.MFI[2*i] - df$C2.MFI[2*i-1]
-  }
-  df$deltaMFI1 <- delta1
-  df$deltaMFI2 <- delta2
-  return(df[-seq(1,20,2),])
-}
-
-liste_delta <-  lapply(liste_patients, delta_MFI)
-
-df_deltaMFI <- liste_delta[[1]]
-for (i in 2:10){
-  df_deltaMFI <- rbind(df_deltaMFI, liste_delta[[i]])
-}
+# Creation d'un dataset adapté
+df_deltaMFI <- data[seq(1, dim(data)[1], 2),]
 
 # Représentation graphique
 graph_delta_MFI1 <- ggplot(df_deltaMFI, aes(x=temps, y = - deltaMFI1, group=as.factor(nom_batch), color=as.factor(nom_batch))) +
@@ -85,6 +69,41 @@ graph_delta_MFI1 <- ggplot(df_deltaMFI, aes(x=temps, y = - deltaMFI1, group=as.f
        color="Patient") + 
   ylim(-2500,10000)
 graph_delta_MFI1
+
+mean(df_deltaMFI$deltaMFI1[seq(1, length(df_deltaMFI$deltaMFI1), 10)])
+rep(df_deltaMFI$deltaMFI1, each = 2)
+
+# Boxplot des Delta MFI par séance pour voir l'évolution générale
+nb_patients <- length(levels(data$nom_batch))
+nb_seances <- length(levels(data$temp)) / 2
+boxplot(-df_deltaMFI$deltaMFI1~rep(1:nb_seances, nb_patients), xlab = "Séance", ylab = "Delta MFI Classe 1", main = "Évolution des delta MFI1 dans le temps", col = "lightblue")
+boxplot(-df_deltaMFI$deltaMFI2~rep(1:nb_seances, nb_patients), xlab = "Séance", ylab = "Delta MFI Classe 2",  main = "Évolution des delta MFI2 dans le temps", col = "lightblue")
+
+# Variations delta MFI dependantes de la durée de séance ? Moyenne / moyenne ou mediane / mediane
+plot(-df_deltaMFI$deltaMFI1~df_deltaMFI$duree)
+plot(-df_deltaMFI$deltaMFI2~df_deltaMFI$duree)
+
+moy1 <- aggregate(cbind(-df_deltaMFI$deltaMFI1, df_deltaMFI$duree) , list(df_deltaMFI$nom_batch), mean, na.rm = TRUE)
+moy2 <- aggregate(cbind(-df_deltaMFI$deltaMFI2, df_deltaMFI$duree) , list(df_deltaMFI$nom_batch), mean, na.rm = TRUE)
+
+plot(moy1[,c(2,3)], xlab = "Delta MFI Classe 1 moyen", ylab = "Durée moyenne", main = "mean(deltaMFI1)~mean(duree)")
+plot(moy2[,c(2,3)], xlab = "Delta MFI Classe 2 moyen", ylab = "Durée moyenne", main = "mean(deltaMFI2)~mean(duree)")
+
+med1 <- aggregate(cbind(-df_deltaMFI$deltaMFI1, df_deltaMFI$duree) , list(df_deltaMFI$nom_batch), median, na.rm = TRUE)
+med2 <- aggregate(cbind(-df_deltaMFI$deltaMFI2, df_deltaMFI$duree) , list(df_deltaMFI$nom_batch), median, na.rm = TRUE)
+
+plot(med1[,c(2,3)], xlab = "Delta MFI Classe 1 médian", ylab = "Durée médianne", main = "median(deltaMFI1)~median(duree)")
+plot(med2[,c(2,3)], xlab = "Delta MFI Classe 2 médian", ylab = "Durée médianne", main = "median(deltaMFI2)~median(duree)")
+
+
+##
+ggplot(df_deltaMFI, aes(x=temps, y = - deltaMFI1/duree, group=as.factor(nom_batch), color=as.factor(nom_batch))) +
+  geom_line() +
+  facet_grid(~semaine, scales = "free_x") +
+  labs(x = "Séance",
+       y = "Delta MFI Classe I / duree seance",
+       color="Patient")
+
 
 graph_delta_MFI2 <- ggplot(df_deltaMFI, aes(x=temps, y = - deltaMFI2, group=as.factor(nom_batch), color=as.factor(nom_batch))) +
   geom_line() +
@@ -97,13 +116,23 @@ graph_delta_MFI2
 
 ## Croisements avec nos variables d'intérêt
 # Croisement entre le MFI1 initial et les covariables
-nb_patient <- length(levels(data$nom_batch))
-palette <- rainbow(nb_patient)
+palette <- rainbow(nb_patients)
 
 # MFI1 Initiaux
 plot(data$C1.MFI[seq(1, 181, 20)], col = palette, pch = 19, main = "Niveau du MFI1 Initial",
      ylab = "MFI1 Initial", xlab = "Patient")
-legend("topright", legend = paste("Patient", 1:nb_patient), col = palette, pch = 19)
+legend("topright", legend = paste("Patient", 1:nb_patients), col = palette, pch = 19)
+
+p1 <- liste_patients[[1]]
+p10 <- liste_patients[[2]]
+p2 <- liste_patients[[3]]
+p3 <- liste_patients[[4]]
+p4 <- liste_patients[[5]]
+p5 <- liste_patients[[6]]
+p6 <- liste_patients[[7]]
+p7 <- liste_patients[[8]]
+p8 <- liste_patients[[9]]
+p9 <- liste_patients[[10]]
 
 # MFI1 Initial X Durée
 duree_MFI1 <- cbind(p1$duree[seq(1, 19, 2)]/p1$C1.MFI[1], p2$duree[seq(1, 19, 2)]/p2$C1.MFI[1],
@@ -142,13 +171,13 @@ lines(MFI1XInit[,9], col = palette[9])
 lines(MFI1XInit[,10], col = palette[10])
 
 # Croisement entre le MFI2 initial et les covariables
-nb_patient <- 8
-palette <- rainbow(nb_patient)
+nb_patients <- 8
+palette <- rainbow(nb_patients)
 
 # MFI2 Initiaux
 plot(c(1:3, 5:7, 9, 10), data$C2.MFI[seq(1, 181, 20)][which(!is.na(data$C2.MFI[seq(1, 181, 20)]))], col = palette, pch = 19, main = "Niveau du MFI2 Initial",
      ylab = "MFI2 Initial", xlab = "Patient")
-legend("topright", legend = paste("Patient", 1:nb_patient), col = palette, pch = 19)
+legend("topright", legend = paste("Patient", 1:nb_patients), col = palette, pch = 19)
 
 # MFI2 Initial X Durée
 duree_MFI2 <- cbind(p1$duree[seq(1, 19, 2)]/p1$C2.MFI[1], p2$duree[seq(1, 19, 2)]/p2$C2.MFI[1],

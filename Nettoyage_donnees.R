@@ -162,6 +162,38 @@ for (i in 2:nb_patients){
   data <- rbind(data, liste_patients[[i]])
 }
 
+# Calcul des delta MFI
+liste_patients <- list()
+for (patient in levels(data$nom_batch)){
+  i <- which(levels(data$nom_batch) == patient)
+  liste_patients[[i]] <- subset(data, data$nom_batch == patient)
+}
+
+delta_MFI = function(df) {
+  delta1 = numeric(20)
+  delta2 = numeric(20)
+  for (i in 1:10){
+    delta1[2*i-1] <- df$C1.MFI[2*i] - df$C1.MFI[2*i-1]
+    delta1[2*i] <- df$C1.MFI[2*i] - df$C1.MFI[2*i-1]
+    delta2[2*i-1] <- df$C2.MFI[2*i] - df$C2.MFI[2*i-1]
+    delta2[2*i] <- df$C2.MFI[2*i] - df$C2.MFI[2*i-1]
+  }
+  df$deltaMFI1 <- delta1
+  df$deltaMFI2 <- delta2
+  return(df[-seq(1,20,2),])
+}
+
+liste_delta <-lapply(liste_patients, delta_MFI)
+
+deltaMFI1 <- rep(liste_delta[[1]][,36], each = 2)
+deltaMFI2 <- rep(liste_delta[[1]][,37], each = 2)
+
+for (i in 2:nb_patients){
+  deltaMFI1 <- c(deltaMFI1, rep(liste_delta[[i]][,36], each = 2))
+  deltaMFI2 <- c(deltaMFI2, rep(liste_delta[[i]][,37], each = 2))
+}
+
+data <- cbind(data, deltaMFI1, deltaMFI2)
 
 ## Création d'un nouveau fichier de données
 write.csv(data, file = "donnees_corrigees_CINEDESIM.csv")
