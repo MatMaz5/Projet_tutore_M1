@@ -48,7 +48,7 @@ bp3000 <- ggplot(df_bp3000, aes(x = seance, y = nb_patients, fill = moment_seanc
   labs(
     x = "Séance", 
     y = "Nombre de patients", 
-    title = "Nombre de patients avec MFI.CI < 3000 à chaque prélèvement",
+    title = "Nombre de patients avec un MFI Classe I < 3000 à chaque prélèvement",
     fill = "Temps dans la séance"
     ) +
   geom_vline(xintercept = 5.5, col = "firebrick", linetype = 2, size = 0.5) +
@@ -60,7 +60,7 @@ bp3000 <- ggplot(df_bp3000, aes(x = seance, y = nb_patients, fill = moment_seanc
     color = "firebrick",
     size = 3,
     angle = 90
-  )
+  ) +
   theme_minimal() +
   theme(
     plot.title = element_text(face = "bold", hjust = 0, size = 12), 
@@ -69,11 +69,11 @@ bp3000 <- ggplot(df_bp3000, aes(x = seance, y = nb_patients, fill = moment_seanc
     legend.position = "right",
     legend.title = element_text(size = 9),
     legend.text = element_text(size = 8)
-    ) +
+    )
 
 ggsave("bp3000.png", plot = bp3000, 
-       width = 7, height = 4, path = "Rendu_final/res_divers/")
-img_bp3000 <-  rasterGrob(readPNG("Rendu_final/res_divers/tab3000.png"), 
+       width = 7, height = 4.5, path = "Rendu_final/res_divers/")
+img_bp3000 <-  rasterGrob(readPNG("Rendu_final/res_divers/bp3000.png"), 
                            interpolate = TRUE)
 
 
@@ -98,10 +98,7 @@ ggsave("tab3000.png", plot = tab3000,
 img_tab3000 <-  rasterGrob(readPNG("Rendu_final/res_divers/tab3000.png"), 
                            interpolate = TRUE)
 
-ggarrange(bp3000, img_tab3000, ncol = 2, nrow = 2)
-
-
-
+ggarrange(img_bp3000)
 
 
 
