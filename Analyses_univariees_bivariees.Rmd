@@ -7,6 +7,31 @@ editor_options:
   chunk_output_type: console
 ---
 
+## Traitement des données
+Afin de pouvoir exploiter les informations de chaque patient, nous avons commencé par traiter l'ensemble du jeu de données. Pour cela, nous avons créé un script R permettant de le mettre en forme de manière automatique par un script R, pour le jeu de données actuel mais aussi qu'il puisse s'adapter si les données venaient à s'alimenter.
+
+La première étape a été de renommer toutes les variables du jeu de données afin de les raccourcir tout en pouvant les comprendre aisément lors de l'interprétation, notamment pouvoir diffférencier les variables des classes I et II qui sont autrement identiques.
+
+Par la suite, le jeu de données fut nettoyé en commençant par le retrait des variables jugées "inutiles" car elles contenaient des informations répétitives ou des modalités constantes pour tous les individus.
+
+Dans notre base, nous possédions aussi les informations de patients pour lesquels les valeurs de MFI étaient diluées pour cause de précision des prélèvement, nous avons alors fusionné les profils de patients dilués et originaux afinde ne conserver que les informations pertinentes.
+
+Ensuite, un travail d'harmonisation des données a été réalisé afin de faire en sorte que toutes les modalités des variables soient comparables en termes de majuscules, termes utilisés et erreurs de saisies.
+
+Dans la continuité de ces traitements, les valeurs nulles contenues dans le fichier ont dues être prises en charges afin de pouvoir utiliser les variables qui en contiennent dans les calculs de modèles ou les fonctions appelées en R. Quand il était possible, il a été décidé de remplacer les valeurs manquantes par les valeurs moyenne de la variable pour le patient en question. En revanche, il existe des cas où cette solution n'était pas envisageable : dans nos variables d'intérêt, car cela pourrait fausser les calculs ainsi que les conclusions tirées de cette étude. Il a alors été décidé de conserver ces variables telles quelles.
+
+Enfin, nous avons jugé judicieux de calculer certaines variables dans le but d'analyser plus naturellement les données, par exemple en analysant l'âge au lieu de la date de naissance, ou alors analyser le jeu de données selon d'autres axes de lecture, comme avec le nombre de semaine de traitement, le temps passé depuis le début du traitement ainsi que l'évolution des MFI suite à chaque séance (variables que nous appelleront *deltaMFI* par la suite)
+
+Pour terminer, nous avons choisi d'exporter le jeu de données nouvellement créé afin de pouvoir le réutiliser plus aisément à la fois dans des analyses R et dans le logiciel Monolix. Ces deux outils n'ayant pas exactement le même but, un jeu de données fut créé pour chaque utilisation. Le premier, destiné à R, fut exporté directement une fois le traitement terminé tandis que pour le second, à destination de Monolix, nous avons sélectionner les variables qui semblaient les plus intéressantes pour expliquer les variables d'intérêt dans les modèles générés.
+
+## Analyse descriptive du jeu de données
+### Analyses univariées
+Dans un premier temps, une fois le nouveau jeu de données formé, nous avons effectué des analyses univariées (variable par variable) de chacune des variables avec la distribution des modalités et un graphique correspondant pour les variables qualitatives et le calcul des moyennes, variables et quartiles ainsi qu'un graphique adapté pour les variables quantitatives. Ce travail a été effectué dans le but de comprendre la population cible de notre jeu de données et de voir les similarités et les différences principales des patients de notre étude.
+
+### Analyses bivariées
+Un fois les premières analyses effectuées, nous avons essayé de déterminer l'existence de liens entre les variables d'intérêt et les covariables, et peut-être même des covariables entre-elles ce qui nous permettrait d'afirmer qu'elles apportent des informations communes et nous que nous pouvons alors réduire le nombre de variables à étudier.
+Pour cela nous avons croisé chacune des variables avec les variables d'intérêt et avons conclu visuellement ou numériquement quand c'était possible et interprétable de l'attrait des variables étudiées entre elles.
+
 ```{r}
 ## Librairies :
 # Installation :
@@ -106,8 +131,10 @@ Nous voyons que la majorité des patients sont des femmes.
 
 # Bivarié
 ```{r}
-plot(C1.MFI~sexe)
-eta2(C1.MFI, sexe)
+MFI1 <- aggregate(data$C1.MFI, list(data$nom_batch), mean, na.rm = TRUE)[,2]
+sexe_bis <- sexe[seq(1,length(sexe), 2 * nb_seances)]
+plot(MFI1~sexe_bis)
+eta2(MFI1,sexe_bis)
 ```
 Nous pouvons voir que bien que nous puissions suggérer une corrélation entre ces variables, le calcul de l'eta2 nous confirme qu'il n'existe qu'un lien très faible.
 
