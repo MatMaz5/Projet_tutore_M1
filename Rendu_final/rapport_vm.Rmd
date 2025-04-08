@@ -1,0 +1,82 @@
+---
+title: "***Modélisation de la désimmunisation de patients en hyperimmunité et en attente de greffe***"
+author: "Matthias MAZET, Enzo VIGNAUD, Kento OKADO, Léonie BREUZA"
+date: "`r Sys.Date()`"
+bibliography: biblio.bib
+output:
+  pdf_document:
+    toc: true
+geometry: margin = 1.6 cm
+---
+
+
+```{r, echo=FALSE}
+# Path (nécessaire pour importer la fonction infos_seuil())
+setwd(dir = "/Users/matmaz/Master/GitHub/Projet_tutore_M1/Rendu_final")
+```
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# Packages
+library(ggplot2)
+library(dplyr)
+library(gridExtra)
+library(grid)
+library(png)
+library(ggpubr)
+```
+
+
+\newpage
+
+
+# ***Contexte***
+L'insuffisance rénale chronique est un problème de santé publique majeur **(1)**. En France, en 2018, 89 692 patients nécessitaient un moyen de suppléance rénale : 49 271 par dialyse et 40 421 par transplantation rénale (TR). Hors, La greffe d'un rein montre encore aujourd'hui un certain taux d'échec, avec une probabilité de rejet du greffon de 10-20% durant l'année suivant l'opération [@RejetGreffe]. \ 
+De nombreux freins contribuent à cette probabilité de rejet. Parmi eux, l'immunisation anti-HLA (Human Leukocyte Antigen), secondaire à une transplantation antérieure, une transfusion ou une grossesse, correspond à l'apparition chez le receveur potentiel d'anticorps anti-HLA dirigés contre le HLA de donneurs potentiels **(3)**. Ces anticorps favorisent l'augmentation du Taux de Greffon Incompatible (TGI) du receveur, ce taux correspondant au pourcentage de reins proposés en France sur les cinq années précédentes que le système immunitaire du patient rejetterait. Les patients pour qui ce TGI dépasse les 80% sont qualifiés d'hyperimmunisés. \
+Les patients hyperimmunisés restent en dialyse en moyenne 35 mois plus tard que les autres patients, ce qui représente un surcoût moyen de 233 000 € pour l'hémodialyse pour un seul patient **(3)**. Pour ceux ayant un TGI de 100%, ils sont dits pratiquement non accessibles à la greffe car possédant des anticorps dirigés contre 100% des reins proposés en France les 5 années précédentes.
+
+Différentes options existent pour améliorer l'accessibilité à la TR chez ces patients hyperimmunisés. Parmi ces options, la désimmunisation vise à retirer plus ou moins durablement les anticorps anti-HLA chez les patients en attente de greffe afin de diminuer leur TGI et donc augmenter le nombre de donneurs potentiels **(4)**. Hors, cette procédure est encore relativement expérimentale et les protocoles décrits varient dans la littérature **(5)**. \
+~~Dans la majorité des cas, la désimmunisation associe un protocole d'immunosuppression standard (tacrolimus, mycophenolate mofetil et cortisone) à l'utilisation d’un traitement déplétant les lymphocytes B (Rituximab) ainsi qu'à des séances d'aphérèses **(6)**. Ces dernières ont pour objectif de traiter le plasma des patients en enlevant les anticorps (notamment anti-HLA). L'aphérèse peut être faite par échange plasmatique (EP), et plus récemment par double-filtration plasmaphérèse (DFPP) ou Immunoadsorption (IA) **(7,8)**.~~ \
+Dans la majorité des cas, la désimmunisation associe un protocole d'immunosuppression standard (médicaments ?) à des séances d'aphérèses dont l'objectif est de traiter le plasma des patients en en retirant les anticorps (et notamment les anti-HLA). Ces séances d'aphérèses peuvent être réalisées à l'aide de différentes techniques, et notamment celle dite d'immunoabsorption (IA). Cette technique innovante, bien que réalisée dans peu de centres de transplantation en Europe et en France **(10)**, est celle privilégiée au CHU Grenoble-Alpes dans le protocole de désimmunisation. \
+Afin de pouvoir envisager une TR, les patients suivant ce genre de protocole doivent posséder une quantité d'anticorps anti-HLA significativement *"négligeable"*. Cette quantité, mesurée via indicateur de fluorescence appelé Mean Fluoresence Intensity (MFI), ne doit pas dépasser le seuil des 3 000 pour Grenoble, et celui des 2 000 au niveau national [@PresProjetEtu]. Si le patient remplit cette condition, un ultime test de compatibilité donneur-receveur, appelé cross match **(9)**, est réalisé avant de lancer une procédure de greffe. 
+
+Cette étude a donc chercher à décrire et modéliser la décroissance des anticorps anti-HLA. Le système immunitaire possédant une grande variété d'anticorps anti-HLA, ces derniers ont été regroupés en deux grandes classes, classe I et classe II, afin d'alléger cette première étude. Pour chaque classe d'anticorps, l'objectif était triple : modéliser la variation des MFI avant/après séance ; modéliser la variation des MFI au cours du protocole d'IA et valider ce modèle ; simuler ce modèle afin d'anticiper le moment où un patient descend en dessous du seuil de MFI. \
+~~L'objectif principal de l'étude est de décrire et modéliser la décroissance des anticorps anti-HLA en fonction de différents paramètres, entre la première séance d’IA et jusqu'à négativation (MFI < 3000) chez les patients insuffisants rénaux terminaux (débit de filtration glomérulaire < 15 ml/min/1.73m2), en attente de TR, hyperimmunisés HLA (TGI > 80%), ayant bénéficié d'une désimmunisation selon la méthode de référence au CHU-GA comprenant notamment 10 séances initiales d’IA sur 15 jours.~~ \
+
+Nous allons donc dans la suite de ce rapport **(cet article ?)** détailler plus en profondeur les différentes méthodes employées et résultats obtenus pour les trois points suivants : les données mises en jeu ; les statistiques descriptives effectuées ; les modèles statistiques construits. Après une discussion autour de l'étude menée, vous trouverez aussi en fin de rapport une analyse sur l'impact environnemental et sociétal de ce projet.
+\
+\
+
+*Cf notes sur le cloud pour les ref. de chaque numéro (à ajouter dans le .bib)*
+
+
+\newpage
+
+
+Résultats sur les seuils de MFI (+ son titre), à caler dans la partie résultats :
+\begin{center}
+$\textbf{Fig. x : Résultats des franchissements de seuils par patient}$
+\end{center}
+```{r, echo=FALSE, fig.align="center", fig.height=5.7, fig.width=7.4}
+# Fonction pour faire l'image 
+source("fct_infos_seuil.R")
+
+# Données
+data <- read.csv("donnees_corrigees_CINEDESIM.csv")
+
+# Image
+ggarrange(infos_seuil(seuil = 2000), 
+          infos_seuil(seuil = 3000), 
+          ncol = 1, nrow = 2)
+```
+
+
+\newpage
+
+
+# ***Bibliographie***
+
+
+
+
+
