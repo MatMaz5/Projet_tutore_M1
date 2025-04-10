@@ -1,0 +1,689 @@
+---
+title: "***Rapport de projet tutoré***"
+author: "Léonie BREUZA, Matthias MAZET, Kento OKADO, Enzo VIGNAUD"
+date: "`r Sys.Date()`"
+# bibliography: reference.bib
+output:
+  pdf_document:
+    toc: true
+geometry: margin = 1.8 cm
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r, include = FALSE}
+# Packages
+library(ggplot2)
+library(GGally)
+library(ggpubr)
+library(dplyr)
+library(grid)
+library(gridExtra)
+library(png)
+```
+
+Logo timc
+Logo CHUGA
+Réferent : Caroline BAZZOLI
+
+!!!!! CONFIDENTIEL : NE PAS DIFFUSER !!!!!
+
+\newpage
+
+
+# **Contexte**
+Les greffes de reins possèdent encore aujourd'hui une certaine probabilité de rejet du greffon par le patient. Cette probabilité augmente fortement (>80%) lorsque ce dernier souffre d'hyperimmunité, c'est-à-dire que le système immunitaire du patient produit une quantité excessive d'anticorps, et notamment d'anticorps anti-HLA responsables du rejet de greffon. \
+Actuellement, les patients atteints d'hyperimmunité suivent un protocole d'immunoabsorption visant à réduire plus ou moins durablement la quantité d'anticorps anti-HLA dans leur corps, et ainsi à augmenter le taux de réussite de la greffe. En plus d'être lourd à supporter (deux semaines de prélèvements et traitements sanguin), ce protocole ne garantit pas le succès de l'opération même si le patient l'achève entièrement. Il semble donc crucial de pouvoir anticiper les effets des séances d'immunoabsorption sur chaque patient afin de lui prescrire un protocole adapté et si possible allégé. \
+À l'aide d'un indicateur de fluorescence de la quantité d'anticorps anti-HLA, le Mean Fluoresence Intensity (MFI), cette étude a donc cherché à modéliser l'évolution de cette quantité au cours du protocole d'immunoabsorption. Notamment, l'anticipation du moment où un patient descendrait en dessous d'un seuil déterminant de MFI permettant de décider ou non si les chances de succès d'une greffe seraient suffisantes.
+
+Trouver une ou deux ref sur les infos du contexte (France rein), rareté de l'hyperimmuinite, nombre de greffes par an
+Systeme immunitaire tres complexe
+systeme HLA complexe donc on divise en deux classes
+Spécifier que les patients malades ont un traitement d'immunosuppresseurs en parallèle qu'on n'a pas encore pris en compte
+Citer ici la norme de greffe seuil MFi de Grenoble et France + ref données par Caro
+
+
+# **Méthodes**
+## *Données*
+Nous avons travaillé à partir de données longitudinales prélevées sur dix patients hyperimmunisés en attente d'une greffe de rein à Grenoble. Chaque patient présente vingt relevés espacés sur deux semaines, soit deux relevés par séance avec généralement une pause le week-end.\
+
+## *Protocole*
+Actuellement, le protocole d'immunoabsorption se répartit en dix séances de désimmunisation étalées sur 2 semaines avec généralement un pause de deux jours le week-end. Chaque séance vise à faire baisser le taux d'anticorps anti-HLA chez un patient en prélevant son plasma et en le traitant à l'aide d'une colonne de désimmunisation. Ce taux est contrôlé via une à un indice de fluorescence de la colonne appelé le *Mean Fluoresscence Index (MFI)* et le but à la fin des dix séances est de le faire descendre en dessous de 3 000, la norme pour Grenoble. Il est à noter que la norme au niveau national est un indice de MFI de 2 000.\
+
+Afin de suivre l'évolution de la quantité de MFI chez un patient, deux relevés sont réalisés à chaque séance, un juste avant le prélèvement et traitement du plasma et un autre à la fin de la séance.\
+
+## *Data Management*
+
+- Harmonisation
+- verification des données / incohérence
+- Données manquantes : var d'interet ou covariables
+- Création de nouvelles variables
+
+Spécifier les prozone/dilutions pas les lignes 1/10 + patient 2 dilue classe I + patient 7 dilue classe II
+
+Afin de pouvoir exploiter les informations de chaque patient, nous avons commencé par traiter l'ensemble du jeu de données. Pour cela, nous avons créé un script R permettant de le mettre en forme de manière automatique par un script R, pour le jeu de données actuel mais aussi qu'il puisse s'adapter si les données venaient à s'alimenter.\
+
+La première étape a été de renommer toutes les variables du jeu de données afin de les raccourcir tout en pouvant les comprendre aisément lors de l'interprétation, notamment pouvoir diffférencier les variables des classes I et II qui sont autrement identiques.\
+
+Par la suite, le jeu de données fut nettoyé en commençant par le retrait des variables jugées "inutiles" car elles contenaient des informations répétitives ou des modalités constantes pour tous les individus.\
+
+Dans notre base, nous possédions aussi les informations de patients pour lesquels les valeurs de MFI étaient diluées pour cause de précision des prélèvement, nous avons alors fusionné les profils de patients dilués et originaux afinde ne conserver que les informations pertinentes.\
+
+Ensuite, un travail d'harmonisation des données a été réalisé afin de faire en sorte que toutes les modalités des variables soient comparables en termes de majuscules, termes utilisés et erreurs de saisies.\
+
+Dans la continuité de ces traitements, les valeurs nulles contenues dans le fichier ont dues être prises en charges afin de pouvoir utiliser les variables qui en contiennent dans les calculs de modèles ou les fonctions appelées en R. Quand il était possible, il a été décidé de remplacer les valeurs manquantes par les valeurs moyenne de la variable pour le patient en question. En revanche, il existe des cas où cette solution n'était pas envisageable : dans nos variables d'intérêt, car cela pourrait fausser les calculs ainsi que les conclusions tirées de cette étude. Il a alors été décidé de conserver ces variables telles quelles.\
+
+Enfin, nous avons jugé judicieux de calculer certaines variables dans le but d'analyser plus naturellement les données, par exemple en analysant l'âge au lieu de la date de naissance, ou alors analyser le jeu de données selon d'autres axes de lecture, comme avec le nombre de semaine de traitement, le temps passé depuis le début du traitement ainsi que l'évolution des MFI suite à chaque séance (variables que nous appelleront *deltaMFI* par la suite).\
+
+Pour terminer, nous avons choisi d'exporter le jeu de données nouvellement créé afin de pouvoir le réutiliser plus aisément à la fois dans des analyses R et dans le logiciel Monolix. Ces deux outils n'ayant pas exactement le même but, un jeu de données fut créé pour chaque utilisation. Le premier, destiné à R, fut exporté directement une fois le traitement terminé tandis que pour le second, à destination de Monolix, nous avons sélectionné les variables qui semblaient les plus intéressantes pour expliquer les variables d'intérêt dans les modèles générés.\
+
+Voici, en résumé dans le tableau suivant, les variables sélectionnées pour la sélection du modèle :\
+  
+|**Nom**|**Description**|**Type/Modalités**|
+|-----:|----------:|-----:|
+|`Durée de la séance (min)`|Durée de la séance **= durée du traitement du plasma ?** (en min)|Continue|
+|`Volume plasma traité`|Volume de plasma traité lors de la séance d'immunoabsorption en question. (en mL)|Continue|
+|`Poids (kg)`|Poids du patient lors de la séance. (en kg)|Continue|
+|`Taille (cm)`|Taille du patient lors de la séance. (en cm)|Continue|
+|`Sexe`|Sexe du patient.|Binaire (H/F)|
+|`Grossesses`|Nombre de grossesses du patient antérieures au protocole.|Discrète (0 à 4 + NC pour les hommes)|
+|`Greffe antérieure`|Nombre de greffes **(de rein ?)** effectué sur le patient avant le protocole.|Discrète (0 ; 1 ; 2)|
+|**AUTRES ?**|||
+||||
+|`Temps`$^*$|Écoulement du temps au fil du protocole, du premier au dernier prélèvement. (en min)|Continue|
+|`delta MFI`$^*$|Variation de la quantité de MFI entre le début et la fin d'une même séance.|Continue|
+*$^*$ : covariables construites.*
+
+Citer logiciels + versions + packages et leur version
+Outils utilisés : R et Monolix.
+
+
+
+
+## *Analyses descriptives*
+Dans un premier temps, une fois le nouveau jeu de données formé, nous avons effectué des analyses univariées (variable par variable) de chacune des variables avec la distribution des modalités et un graphique correspondant pour les variables qualitatives et le calcul des moyennes, variables et quartiles ainsi qu'un graphique adapté pour les variables quantitatives. Chaque variable a été étudiée de manière univariée en calculant des indicateurs statistiques pertinents : pour les quantitative ; la moyenne, la médiane, l'écart type, ... et pour les qualitatives ; la distribution des modalités puis pour chacunes des représentations graphiques appropriées. Les variables en question sont les variables d'intérêts (les MFI classes I et II), l'âge, le poids, la taille, le sexe, le nombre de grossesse, le volue de plasma traité par séance, les durées de séances, les antécédents de greffes et de transfusions.
+
+Nous avons ensuite étudié les liens entre les variables d'intérêts et les autres variables à l'aide d'indicateurs de corrélation, de tests statistiques et de représentations graphiques. Ainsi, nous avons observé les corrélations suivantes :
+- les MFI selon le sexe
+- les MFI selon les antécédents de transfusion
+- les deltaMFI selon la durée de séance
+- la duree selon le poids
+- la durée selon la taille
+
+
+
+
+## *Modélisation*
+
+Avant de commencer la modelisation, voici l'allure des variables d'intérêt à modéliser :
+Spaghetti plot des classe I et classe II
+Description univarié sur pourquoi on passe sur des modèles NLAEM
+
+
+Dans ce projet, nous avons utilisé des modèles non linéaires à effets mixtes pour décrire l’évolution longitudinale des quantités de MFI. Ces modèles sont utilisés quand des mesures d’un critère biologique répétées au cours du temps son relevées sur une population de sujets.\
+
+Ils permettent de distinguer deux sources de variabilité : les effets fixes, qui reflètent la tendance moyenne au sein de la population, et les effets aléatoires, qui capturent l’hétérogénéité interindividuelle.\
+
+La forme générale du modèle s’écrit :
+
+$$
+MFI_{i,j} = f(t_{ij}, \phi_i, v_i) + \epsilon_{ij}
+$$
+
+où :
+
+- \( MFI_{i,j} \) est la \( j \)-ième mesure pour l’individu \( i \) ;
+- \( f \) est une fonction non linéaire décrivant la dynamique du processus ;
+- \( \phi_i = A\beta + Bb_i \) sont les paramètres individuels de l’individu \( i \), décomposés en effets fixes \( \beta \) et effets aléatoires \( b_i \) ;
+- \( v_i \) représente les covariables associées à l’individu \( i \) ;
+- \( \epsilon_{ij} \sim \mathcal{N}(0, \sigma^2) \) représente l’erreur résiduelle.
+
+
+Petite phrase sur le process de la modelisation :
+1er : Trouver le  meilleur f
+2eme : choisir le modele stat associer (erreur residuelle / garder les effets aléatoires omega etc)
+3eme : valider le modele de base
+4eme : Construction du modele avec covariables / Integration des covariables
+5eme : Validation du modèle complet
+
+Numéroter les modèles pour les citer après plus facilement
+
+
+#### *Modèle à un compartiment*\
+
+Nous représentons la dynamique des MFI par un modèle à un compartiment, dans lequel les anticorps sont produits naturellement en continu. Les séances de désimmunisation sont modélisées comme des périodes durant lesquelles les MFI sont éliminés activement.\
+
+**(Insérer un schéma du modèle compartimental ici)**
+
+La quantité de MFI dans le compartiment \( A \) suit la dynamique suivante :
+
+$$
+\begin{aligned}
+\frac{dA}{dt} &= K_p \cdot A - \mu(t) \cdot K_e \cdot A \\
+A(t_0) &= A_0
+\end{aligned}
+$$
+
+où :
+
+- \( K_p \) est le taux de production des MFI ;
+- \( K_e \) est le taux d’élimination pendant les séances ;
+- \( \mu(t) \) est une fonction indicatrice valant 1 pendant les séances et 0 en dehors ;
+- \( A_0 \) est la quantité initiale de MFI.
+
+Nous avons également considéré une formulation non linéaire basée sur la cinétique de Michaelis-Menten :
+
+$$
+K(t) = \frac{V_{\text{max}} \cdot MFI(t)}{K_m + MFI(t)}
+$$
+
+où \( V_{\text{max}} \) est la vitesse maximale de la réaction, et \( K_m \) la constante de Michaelis.\
+
+Trois variantes sont testées : saturation sur le taux de production, sur le taux d’élimination, ou sur les deux simultanément. \
+
+#### *Modèle à deux compartiments*\
+
+Ce modèle distingue deux compartiments : un compartiment de production (A) et un compartiment d’élimination (B), entre lesquels les MFI circulent.
+
+**(Insérer un schéma du modèle à deux compartiments ici)**
+
+Le système est modélisé par :
+
+$$
+\begin{aligned}
+\frac{dA}{dt} &= K_p \cdot A - K_A \cdot A + K_B \cdot B \\
+\frac{dB}{dt} &= K_A \cdot A - K_B \cdot B - \mu(t) \cdot K_e \cdot B \\
+A(t_0) &= A_0, \quad B(t_0) = B_0
+\end{aligned}
+$$
+
+où \( K_A \) et \( K_B \) représentent les taux de transfert entre les compartiments A et B.
+
+
+#### *Modèle Kinetic-Pharmacodynamic (K-PD)*\
+
+Les modèles K-PD permettent de modéliser un effet pharmacodynamique sans mesurer explicitement les concentrations du médicament. Ils reposent sur l’introduction d’un compartiment fictif, représentant la "concentration virtuelle" d’un médicament induit par le traitement.\
+
+Chaque séance est modélisée comme une dose virtuelle administrée au début de la séance. Plusieurs schémas de dosage ont été testés :\
+
+- dose constante (1) à chaque séance ;
+- dose croissante de 1 à 10 ;
+- dose proportionnelle au volume de plasma traité ;
+- dose proportionnelle à la durée de la séance.
+
+Le système est modélisé comme suit :
+
+$$
+\begin{aligned}
+\frac{dA}{dt} &= -K_{DE} \cdot A \\
+\frac{dMFI}{dt} &= K_p \cdot \left(1 - \frac{IR}{EDK_{50} + IR}\right) - K_e \cdot MFI, \quad \text{avec } IR = K_{DE} \cdot A
+\end{aligned}
+$$
+
+où \( K_{DE} \) est le taux d’élimination du compartiment virtuel, \( EDK_{50} \) le paramètre de sensibilité, et \( K_p \), \( K_e \) les constantes de production et d’élimination.\
+
+Une reformulation permet une meilleure interprétation :
+
+$$
+\begin{aligned}
+\frac{dA}{dt} &= -K_{DE} \cdot A \\
+\frac{dMFI}{dt} &= K_p \cdot \left(1 - \frac{A}{A_{50} + A}\right) - K_e \cdot MFI
+\end{aligned}
+$$
+
+où \( A_{50} \) est la quantité de médicament nécessaire pour inhiber de moitié la production des MFI.
+
+
+#### *Modèles d’inhibition de la croissance tumorale*\
+
+Enfin, nous avons exploré des modèles issus de la modélisation de la croissance tumorale et de son inhibition (TGI), adaptés à notre problématique. Ces modèles présentent une dynamique proche de celle des MFI, en particulier lorsqu’on considère les MFI comme une "masse" pouvant croître ou décroître sous l’effet d’un traitement.\
+
+Le modèle général est :
+
+$$
+\frac{dMFI}{dt} = g(MFI(t), K_p, x_i) - K_e \cdot MFI(t), \quad MFI(t_0) = MFI_0
+$$
+
+où \( g \) représente la fonction de croissance, dépendante de \( K_p \) et d'autres paramètres spécifiques \( x_i \), et \( K_e \) modélise l’effet d’élimination.
+
+
+#### *Estimation des paramètres*\
+
+Les modèles considérés intègrent à la fois des effets fixes et des effets aléatoires. Dans un premier temps, seuls les paramètres des effets fixes seront estimés, afin de permettre la comparaison des modèles. L’estimation des effets aléatoires sera réalisée dans un second temps, uniquement sur le modèle final retenu. L’ensemble des estimations sera effectué à l’aide de l’algorithme **SAEM** (Stochastic Approximation Expectation-Maximization).
+
+
+#### *Sélection de modèles*\
+
+Nous comparerons les modèles selon 3 critères :
+
+- Critère d'information : BIC (Bayesian Information Criterion)  
+- Précision d’estimation des paramètres : Relative Standard Error (RSE%)  
+- Graphiques : Visual Predictive Check (VPC), Résidus, Individual fits
+
+
+## *Simulation de protocole*
+Si possible
+
+
+
+
+
+
+# **Résultats**
+## *Statistiques descriptives*
+Nous passons maintenant aux résultats obtenus lors de la mise en place du projet.
+Tout d'abord les descriptions univariées des variables sélectionnées.
+
+```{r, include = FALSE}
+## Importation des données
+data <- read.csv("donnees_corrigees_CINEDESIM_MONOLIX.csv", header = TRUE, encoding = "UTF-8")[-1]
+
+# Mise en facteur des variables quali :
+data$nom_batch <- factor(data$nom_batch)
+data$temp <- factor(data$temp)
+data$sexe <- factor(data$sexe)
+data$transfusion <- factor(data$transfusion)
+data$semaine <- factor(data$semaine, labels = c("Semaine 1", "Semaine 2"))
+
+# Passage des variables quanti de caractère à numérique :
+data$poids <- as.double(data$poids)
+data$vol_pla_traite <- as.integer(data$vol_pla_traite)
+
+attach(data)
+nb_patients <- length(levels(nom_batch))
+nb_seances <- length(levels(temp))/2
+
+df_deltaMFI <- data[seq(1, dim(data)[1], 2),]
+```
+
+```{r, echo = FALSE}
+TAB_resume <- as.matrix(summary(data[,-c(1:3, 10, 13, 15:21)]))
+cat("Voici le résumé des variables quantitatives :")
+TAB_resume
+
+TAP_sexe <- as.data.frame(table(sexe)/(nb_seances*2))
+cat("La distribution de la variable sexe :")
+TAP_sexe
+
+TAP_transfu <- as.data.frame(table(transfusion)/(nb_seances*2))
+cat("La distribution de la variable transfusion :")
+TAP_transfu
+```
+Nous pouvons alors observer les profils des patients en notant qu'ils sont globalement putôt équilibrés au niveau de l'age avec une moyenne proche de la médiane et une étendue de 56 ans. De plus, nous pouvons remarquer un poids hétérogène bien que la taille des patients soient plutôt similaires, ce qui nous laisse penser à des profils morphologiques très différents. Nous voyons aussi que la plupart des patients sont des femmes qui ont presque toutes porté au moins un enfant. Enfin, par rapport à l'activité des anticorps, nous ne pouvons pas voir d'indications précise, il est alors plus judicieux de tracer cette dernière indépendemment.
+
+Nous observons en détail quelques variables intéressante pour chaque patient:
+```{r, echo = FALSE}
+plot(poids~nom_batch, xlab  = "Patient", ylab = "Poids", main = "Distribution des poids des patients mesurés à chaque séance", col = "lightblue")
+```
+Nous remarquons ici que le poids des patients est fluctuant entre chaque séance, sûrement dû à leur maladie ainsi qu'aux traitements suivis. Ces variations restent toutefois faibles avec un seul cas où nous remarquons une différence notable, pour le patient 5.
+
+```{r, echo = FALSE}
+plot(duree~nom_batch, xlab  = "Patient", ylab = "Durée de séance", main = "Distribution des durées de séance par patient", col = "lightblue")
+```
+Ici, nous pouvons voir que les durées de séances gravitent aux alentours de 175 minutes par patient avec uniquement les patients 4 et 9 qui s'en éloignent possédant une durée plus élevée plus vers les alentours de 250 minutes.
+
+```{r, echo = FALSE}
+plot(vol_pla_traite~nom_batch, xlab  = "Patient", ylab = "Volume de plasma", main = "Distribution des volumes de plasma traité chaque séance par patient", col = "lightblue")
+```
+Nous pouvons voir qu'ici aussi les volume traités sont plutôt homogènes pour la plupart des patients avec encore une fois un écartement à la moyenne plus élevé pour les patients 4 et 9.
+
+Nous représentons maintenant l'évolution de l'activité du système immunitaire des patients au cours du temps.
+
+Pour la classe I :
+Nous observons l'évolution de l'activité des anticorps de classe I dans le système immunitaire des patients.
+```{r, echo = FALSE}
+graph_MFI1 <-  ggplot(data, aes(x = temps, y = C1.MFI, group=as.factor(nom_batch), color=as.factor(nom_batch))) +
+  geom_line() +
+  facet_grid(~semaine, scales = "free_x") +
+  geom_hline(yintercept = 3000, color = "black", linetype = "dashed") +
+  labs(x = "Temps en heures",
+       y = "MFI classe I",
+       color="Patient")
+graph_MFI1
+```
+Nous pouvons voir que les MFI chutent drastiquement pendant les séances de désimmunisation mais remontent massivement entre 2 séance. Nous observons tout de même une tendance décroissante des MFI pour l'ensemble des patients avec la majorité d'entre eux qui atteignent le seuil de 3000 à la fin de la période de traitement. En revanche, nous observons aussi un fort rebond des MFI suite à la pause du week-end entre les deux semaines de traitement
+
+Nous regardons maintenant les variations de cette activité au cours de chaque séance.
+```{r, echo = FALSE}
+# Analyse descriptive des deltaMFI
+resume_deltaMFI1 <- cbind(aggregate(cbind(-df_deltaMFI$deltaMFI1, df_deltaMFI$pct_reduc_deltaMFI1) , list(df_deltaMFI$nom_batch), mean, na.rm = TRUE), df_deltaMFI$C1.MFI[seq(10, 100, 10)] - df_deltaMFI$C1.MFI[seq(1, 100, 10)])
+colnames(resume_deltaMFI1) <- c("Patient", "deltaMFI1 moyen", "Réduction moyenne", "Evolut° totale MFI1")
+resume_deltaMFI1
+```
+Nous confirmons alors ce que nous avions relevé précédemment ; la plupart des patients subissent une forte baisse de l'activité immunitaire lors des séances avec jusquà 75% de réduction de l'activité en 1 séance pour le patient 4. Au global, seul le patient 10 n'a pas subi de baisse très forte de son activité avec une baisse de seulement 1000 pour les anticorps de classe I.
+
+Graphiquement : 
+```{r, echo = FALSE}
+# Représentation graphique des deltaMFI
+graph_delta_MFI1 <- ggplot(df_deltaMFI, aes(x=temps, y = - deltaMFI1, group=as.factor(nom_batch), color=as.factor(nom_batch))) +
+  geom_line() +
+  facet_grid(~semaine, scales = "free_x") +
+  labs(x = "Temps depuis le début du traitement",
+       y = "Delta MFI Classe I",
+       color="Patient") + 
+  ylim(-2500,10000)
+graph_delta_MFI1
+```
+Nous constatons graphiquement que plus le temps passe, moins les séances sont efficaces en observant la tendance décroissante nette de ces courbe. Cependant, contrairement au rebond montré par les MFI durant le week-end, les variations de l'activité immunitaire ne semblent pas très affectées par la pause imposée du traitement.
+
+Nous confirmons cette hypothèse à l'aide du graphique suivant:
+```{r, echo = FALSE}
+boxplot(-df_deltaMFI$deltaMFI1~df_deltaMFI$seance, xlab = "Séance", ylab = "Delta MFI Classe I", main = "Évolution des deltaMFI classe I dans le temps", col = "lightblue")
+```
+Ce graphique nous permet bien d'affirmer que le traitement perd en efficacité sur les anticorps de classe I avec une forte réduction de la variabilité de la première séance à la dernière et une médiane qui diminue aussi au fur et à mesure. Nous pouvons aussi observer ici le phénomène dû à la coupure du traitement pendant le week-end avec une baisse qui se fait en deux étapes, une première pendant les cinq premières séances et une deuxième pendant les cinq dernières.
+
+Pour la classe II :
+Nous observons l'évolution de l'activité des anticorps de classe II dans le système immunitaire des patients.
+```{r, echo = FALSE}
+graph_MFI2 <-  ggplot(data, aes(x = temps, y = C2.MFI, group=as.factor(nom_batch), color=as.factor(nom_batch))) +
+  geom_line() +
+  facet_grid(~semaine, scales = "free_x") +
+  geom_hline(yintercept = 3000, color = "black", linetype = "dashed") +
+  labs(x = "Temps en heures",
+       y = "MFI classe I",
+       color="Patient")
+graph_MFI2
+```
+Nous pouvons voir que l'activité des anticorps de classe II semble être de la même nature que celle des anticorps de classe I avec de fortes chutes pendant les séances mais avec cette fois ci des remontées encores plus fortes entre les séances. Nous remarquons que l'effet de la pause du week-end est au moins aussi importante que pour la classe précédente. Le tout mène les MFI à ne passer le seuil de 3000 que pour 30% des patients.
+
+Afin d'avoir plus de détails, nous regardons maintenant les variations de cette activité durant chaque séance.
+```{r, echo = FALSE}
+resume_deltaMFI2 <- cbind(aggregate(cbind(-df_deltaMFI$deltaMFI2, df_deltaMFI$pct_reduc_deltaMFI2) , list(df_deltaMFI$nom_batch), mean, na.rm = TRUE), df_deltaMFI$C2.MFI[seq(10, 100, 10)] - df_deltaMFI$C2.MFI[seq(1, 100, 10)])
+colnames(resume_deltaMFI2) <- c("Patient", "deltaMFI2 moyen", "Réduction moyenne", "Evolut° totale MFI2")
+resume_deltaMFI2
+```
+Nous observons que bien que les évolutions moyennes des MFI de classe II soient globalement plus fortes que celles de classe I, avec par exemple 3 réductions moyennes de MFI au dessus de 65% et des deltaMFI plus élevés, comme évoqué précédemment le rebond entre chaque séance ne permet alors pas de conserver l'inertie de ces baisse et ne permet pas de finir sous la barre des 3000.
+
+Graphiquement : 
+```{r, echo = FALSE}
+graph_delta_MFI2 <- ggplot(df_deltaMFI, aes(x=temps, y = - deltaMFI2, group=as.factor(nom_batch), color=as.factor(nom_batch))) +
+  geom_line() +
+  facet_grid(~semaine, scales = "free_x") +
+  labs(x = "Temps depuis le début du traitement",
+       y = "Delta MFI Classe II",
+       color="Patient")
+graph_delta_MFI2
+```
+Comme la remontée après chaque séance est très haute, nous ne remarquons ici pas de baisse notable de l'effet des séances d'immuno-absorption ni même aucune tendance générale des variations d'activité avec certains patients pour qui les séances perdent et efficacité, d'autres stagnent et enfin d'autres pour qui elle augmente. Le traitement ne semble alors pas très concluant pour diminuer l'activité des anticorps de classe II.
+
+Nous confirmons cette hypothèse à l'aide du graphique suivant
+```{r, echo = FALSE}
+boxplot(-df_deltaMFI$deltaMFI2~df_deltaMFI$seance, xlab = "Séance", ylab = "Delta MFI Classe II", main = "Évolution des deltaMFI classe II dans le temps", col = "lightblue")
+```
+Nous remarquons bien qu'au global le traitement ne semble pas perdre en efficacité au cours du temps sur les anticorps de classe II bien que nous aurions finalement pu penser l'inverse en n'observant que la première semaine de traitement.
+
+Nous passons maintenant à l'étude des liens entre les variables, nous n'avons conservé que les relations qui semblaient importantes à étudier.
+Nous commençons par nous intéresser aux liens existants avec les MFI.
+```{r, include = FALSE}
+ggpairs(data[,-c(1:3, 15:17, 20:21)], cardinality_threshold = 20)
+```
+
+```{r, echo = FALSE}
+graph_MFI1_sexe <-  ggplot(data, aes(x = temps, y = C1.MFI, group=as.factor(nom_batch), color=as.factor(sexe))) +
+  geom_line() +
+  facet_grid(~semaine, scales = "free_x") +
+  geom_hline(yintercept = 3000, color = "black", linetype = "dashed") +
+  labs(x = "Temps en heures",
+       y = "MFI classe I",
+       color="Sexe")
+graph_MFI1_sexe
+
+graph_MFI2_sexe <-  ggplot(data, aes(x = temps, y = C2.MFI, group=as.factor(nom_batch), color=as.factor(sexe))) +
+  geom_line() +
+  facet_grid(~semaine, scales = "free_x") +
+  geom_hline(yintercept = 3000, color = "black", linetype = "dashed") +
+  labs(x = "Temps en heures",
+       y = "MFI classe I",
+       color="Sexe")
+graph_MFI2_sexe
+```
+Nous pouvons observer dans les cas de chacune des deux classes d'anticorps, l'activité du système immunitaire des femmes semble être plus élevée que celle des hommes. Il semble donc y avoir un lien entre le sexe du patient et l'activité de son système immunitaire.
+
+```{r, echo = FALSE}
+graph_MFI1_transfu <-  ggplot(data, aes(x = temps, y = C1.MFI, group=as.factor(nom_batch), color=as.factor(transfusion))) +
+  geom_line() +
+  facet_grid(~semaine, scales = "free_x") +
+  geom_hline(yintercept = 3000, color = "black", linetype = "dashed") +
+  labs(x = "Temps en heures",
+       y = "MFI classe I",
+       color="Antécédent de transfusion")
+graph_MFI1_transfu
+
+graph_MFI2_transfu <-  ggplot(data, aes(x = temps, y = C2.MFI, group=as.factor(nom_batch), color=as.factor(transfusion))) +
+  geom_line() +
+  facet_grid(~semaine, scales = "free_x") +
+  geom_hline(yintercept = 3000, color = "black", linetype = "dashed") +
+  labs(x = "Temps en heures",
+       y = "MFI classe I",
+       color="Antécédent de transfusion")
+graph_MFI2_transfu
+```
+En voyant ces graphiques, nous pouvons penser que les patients ayant déjà été transfusés ont, pour les deux classes d'anticorps, une activité immunitaire plus élevée que ceux n'en n'ayant jamais eu. Il semblerait alors que les antécédent de transfusion aient bien un impact sur le niveau des MFI.
+
+Nous nous intéressons maintenant aux liens existants avec les delta MFI.
+```{r, echo = FALSE}
+plot(-df_deltaMFI$deltaMFI1~df_deltaMFI$duree, ylab = "Delta MFI Classe I", xlab = "Durée de séance", main = "Évolution de la variation des MFI classe I selon la durée de la séance", pch = 16)
+plot(-df_deltaMFI$deltaMFI2~df_deltaMFI$duree, ylab = "Delta MFI Classe II", xlab = "Durée de séance", main = "Évolution de la variation des MFI classe II selon la durée de la séance", pch = 16)
+cat("Coefficient de corrélation de la relation entre les deltaMFI1 et la durée de séance :", summary(lm(-df_deltaMFI$deltaMFI1~df_deltaMFI$duree))$r.squared)
+cat("Coefficient de corrélation de la relation entre les deltaMFI2 et la durée de séance :", summary(lm(-df_deltaMFI$deltaMFI2~df_deltaMFI$duree))$r.squared)
+```
+En observant les représentations graphiques, nous ne parvenons pas à déterminer ed relation liant les deux variables. En regardant les coefficients de corrélation linéaire, nous confirmons qu'il ne semble exister aucune corrélation linéaire entre les deltaMFI et la durée des séances.
+
+Enfin, nous nous intéressons aux liens entre les autres variables.
+```{r, echo = FALSE}
+plot(duree~poids, xlab = "Poids", ylab = "Durée de la séance", main = "Évolution de la durée de la séance selon le poids du patient", pch = 16)
+cat("Coefficient de corrélation de la relation entre la durée de séance et le poids du patient :", summary(lm(duree~poids))$r.squared)
+```
+En regardant le graphique et le calcul du $R^2$ de la relation, il semble y avoir une corrélation linéaire positive modérée entre la durée des séances effectuées par les patients et leur poids
+
+```{r, echo = FALSE}
+plot(duree~taille, xlab = "Taille", ylab = "Durée de la séance", main = "Évolution de la durée de la séance selon la taille du patient", pch = 16)
+cat("Coefficient de corrélation de la relation entre la durée de séance et la taille du patient :", summary(lm(duree~taille))$r.squared)
+```
+Comme précédemment, au vu du graphique et de l'indicateur de corrélation, la durée de la séance semble être liée modéremment et de façon linéaire positive à la taille des patients.
+
+
+
+
+
+
+
+
+Graph des seuils
+Avant et après séance
+Lien entre MFI à t_0 et nombre de séance avant l'atteinte du seuil (soit 1ere atteinte soit atteinte qui remonte plus)
+
+On observe alors les seuils :
+```{r}
+infos_seuil <- function(df = data, seuil = 3000, classe = C1.MFI) {
+  # Format du df
+  df$nom_batch <- factor(df$nom_batch)
+  df$temp <- factor(
+    df$temp, 
+    levels = c("t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9", "t10",
+               "t11", "t12", "t13", "t14", "t15", "t16", "t17", "t18", "t19", "t20")
+  )
+  df <- df %>%
+    arrange(nom_batch, temp)
+  
+  
+  # Classe choisie
+  nom_classe <- as_label(rlang::enquo(classe))
+  titre_classe <- ifelse(nom_classe == "C1.MFI", "Classe I", "Classe II")
+  
+  
+  # Barplot
+  ## Données
+  temps_complets <- data.frame(temp = levels(df$temp))
+  df_bp <- df %>%
+    filter({{classe}} < seuil) %>%
+    group_by(temp) %>%
+    summarise(nb_patients = n_distinct(nom_batch), .groups = "drop") %>%
+    right_join(temps_complets, by = "temp") %>%
+    mutate(nb_patients = ifelse(is.na(nb_patients), 0, nb_patients))
+  df_bp$seance <- factor(
+    c("S1", "S1", "S2", "S2", "S3", "S3", "S4", "S4", "S5", "S5", 
+      "S6", "S6", "S7", "S7", "S8", "S8", "S9", "S9", "S10", "S10"), 
+    levels = c("S1", "S2", "S3", "S4", "S5", "S6", "S7", "S8", "S9", "S10")
+  )
+  df_bp$moment_seance <- factor(
+    df_bp$temp, 
+    labels = rep(c("Début", "Fin"), dim(df_bp)[1]/2),
+    levels = c("t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8", "t9", "t10",
+               "t11", "t12", "t13", "t14", "t15", "t16", "t17", "t18", "t19", "t20")
+  )
+  
+  ## Graphique
+  bp <- ggplot(df_bp, aes(x = seance, y = nb_patients, fill = moment_seance)) +
+    geom_col(position = "dodge") +
+    scale_y_continuous(limits = c(0, 10), breaks = 0:10) +  
+    scale_fill_manual(values = c("#4e757e", "#add5e0")) +
+    labs(
+      x = "Séance", 
+      y = "Nombre de patients", 
+      title = paste(
+        "Nombre de patients avec un MFI", titre_classe, "<", 
+        seuil, 
+        "à chaque prélèvement"
+      ),
+      fill = "Temps dans la séance"
+    ) +
+    geom_vline(xintercept = 5.5, col = "firebrick", linetype = 2, linewidth = 0.5) +
+    geom_label( 
+      x = 5.5, 
+      y = 8.5, 
+      label = "Week-end",
+      fill = "white", 
+      color = "firebrick",
+      size = 3,
+      angle = 90
+    ) +
+    theme_minimal() +
+    theme(
+      plot.title = element_text(face = "bold", hjust = 0, size = 13), 
+      axis.title = element_text(size = 10),
+      axis.text = element_text(size = 7),
+      legend.position = "right",
+      legend.title = element_text(size = 10),
+      legend.text = element_text(size = 8)
+    )
+  ggsave("bp_seuil.png", plot = bp, width = 7, height = 5)
+  img_bp_seuil <- rasterGrob(readPNG("bp_seuil.png"))
+  
+  
+  # Tableau récapitulatif
+  ## Premier prélèvement avec MFI < seuil
+  prem_temp <- df %>%
+    group_by(nom_batch) %>%
+    filter({{classe}} < seuil) %>%
+    summarise(prem_temp_ss_seuil = first(temp))
+  
+  ## Prélèvement après lequel MFI toujours < seuil
+  tjrs_ss_seuil <- function(temp, mfi) {
+    for (i in seq_along(mfi)) {
+      if (all(mfi[i:length(mfi)] < seuil)) {
+        return(temp[i])
+      }
+    }
+    return(NA)
+  }
+  stable_temp <- df %>%
+    group_by(nom_batch) %>%
+    summarise(
+      temp_stable_ss_seuil = tjrs_ss_seuil(temp, {{classe}})
+    )
+  
+  ## Fusion des infos dans un même df
+  df_tab <- df %>%
+    group_by(nom_batch) %>%
+    summarise(MFI_t1 = {{classe}}[temp == "t1"][1]) %>%
+    left_join(prem_temp, by = "nom_batch") %>%
+    left_join(stable_temp, by = "nom_batch") %>%
+    mutate(
+      prem_temp_ss_seuil = ifelse(
+        is.na(prem_temp_ss_seuil),
+        "Non atteint", 
+        paste0(prem_temp_ss_seuil)
+      ),
+      temp_stable_ss_seuil = ifelse(
+        is.na(temp_stable_ss_seuil),
+        "Non atteint", 
+        paste0(temp_stable_ss_seuil)
+      )
+    ) %>%
+    arrange(desc(MFI_t1))
+  
+  
+  tab <- tableGrob(
+    df_tab, 
+    rows = rep("", nrow(df_tab)),
+    cols = c(
+      "Patient", 
+      "MFI à t1", 
+      paste("Premier\nprélèvement\navec MFI <", seuil), 
+      paste("Prélèvement à partir\nduquel le patient\nreste sous", seuil, "MFI")
+    )
+  )
+  
+  ggsave("tab_seuil.png", plot = tab, 
+         width = 5.1, height = 3.7)
+  img_tab_seuil <- rasterGrob(readPNG("tab_seuil.png"))
+  
+  ggarrange(img_bp_seuil, img_tab_seuil, ncol = 2, nrow = 1)
+}
+
+# Atteinte du seuil de MFI
+ggarrange(infos_seuil(seuil = 2000), infos_seuil(seuil = 3000), ncol = 1, nrow = 2)
+
+```
+
+
+## *Modèles*
+Résultats des modèles (graphiques + indices de qualité/comparaison) :
+
+  - modèles K-PD.
+  - modèles TGI.
+
+Meilleur modèle : lequel et pourquoi.
+
+
+# **Discussion/Conclusion** 
+Objectif de l'étude : modéliser l'évolution de la quantité de MFI au cours du protocole afin d'anticiper le moment où une greffe devient possible => réduire la charge du protocole pour les patients.
+
+Principaux résultats : 
+
+  - Quelle(s) covariable(s) influence(nt) l'évolution du taux de MFI ?
+  - Meilleur modèle : rappel de ses paramètres d'entrée + fiabilité
+
+
+Limites de l'étude (hypothèses, a priori...) : 
+
+  - Pas assez de patients/données ? 
+  - Compréhension du système immunitaire encore trop limité ? 
+
+
+Ouverture : qu'est-ce qu'il pourrait être fait par la suite ?
+
+  - Améliorer la précision des prélèvements ?
+
+
+
+# **Impact Environnemental et Sociétal**
+Cf site et pdf sur Moodle.
+
+## *Impact environnemental personnel*
+- Trajets domicile-travail et autres déplacements.
+- Consommation des équipements utilisés (ordinateurs fixes ou portables, temps d'utilisation serveur, etc.).
+- Autres impacts ?
+
+
+## *Impact global du projet*
+### Impact environnemental
+
+
+### Impact sociétal
+
+
+## *Politique de la structure d'accueil*
+Pas concerné pour ce projet. (?)
