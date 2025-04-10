@@ -30,7 +30,6 @@ library(ggpubr)
 
 \newpage
 
-
 # ***Contexte***
 L'insuffisance rénale chronique est un problème de santé publique majeur **[@InsuRenale]**. En France, en 2021, 93 084 patients nécessitaient un moyen de suppléance rénale : 51 662 par dialyse et 41 422 par transplantation rénale (TR) **[@ChiffresREIN]**. Hors, La greffe d'un rein montre encore aujourd'hui un certain taux d'échec, avec une probabilité de rejet du greffon de 10-20% durant l'année suivant l'opération **[@RejetGreffe]**. \
 De nombreux freins contribuent à cette probabilité de rejet. Parmi eux, l'immunisation anti-HLA (Human Leukocyte Antigen), secondaire à une transplantation antérieure, une transfusion ou une grossesse, correspond à l'apparition chez le receveur potentiel d'anticorps anti-HLA dirigés contre le HLA de donneurs potentiels **[@DefAntiHLA]**. Ces anticorps favorisent l'augmentation du Taux de Greffon Incompatible (TGI) du receveur, ce taux correspondant au pourcentage de reins proposés en France sur les cinq années précédentes que le système immunitaire du patient rejetterait. Les patients pour qui ce TGI dépasse les 80% sont qualifiés d'hyperimmunisés. \
@@ -133,6 +132,9 @@ $\textbf{Fig. x : Résultats des franchissements de seuils par patient}$
 
 
 # ***Bibliographie***
+
+
+
 
 
 
